@@ -5,19 +5,21 @@ import {
   SiteFooter,
   SiteHeader,
 } from "../components/site-sections";
+import { getInsights, getSiteContent } from "../lib/wordpress";
 
-export default function PortfolioPage() {
+export default async function PortfolioPage() {
+  const [siteContent, insights] = await Promise.all([
+    getSiteContent(),
+    getInsights(),
+  ]);
+
   return (
     <main className="page-shell">
       <SiteHeader />
-      <PageIntro
-        eyebrow="Portfolio"
-        title="Selected insights and case-study style content for a premium agency presentation."
-        description="This page can later be replaced with CMS-backed projects, but it is already split into its own route and ready for expansion."
-      />
-      <InsightsSection />
+      <PageIntro {...siteContent.pageIntros.portfolio} />
+      <InsightsSection posts={insights} />
       <CtaStrip />
-      <SiteFooter />
+      <SiteFooter contactEmail={siteContent.contact.email} />
     </main>
   );
 }

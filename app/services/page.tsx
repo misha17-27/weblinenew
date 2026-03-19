@@ -4,18 +4,17 @@ import {
   SiteFooter,
   SiteHeader,
 } from "../components/site-sections";
+import { getSiteContent } from "../lib/wordpress";
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const siteContent = await getSiteContent();
+
   return (
     <main className="page-shell">
       <SiteHeader />
-      <PageIntro
-        eyebrow="Services"
-        title="Specialized services for brands that want a sharper digital presence."
-        description="Design, engineering, and UX are handled as one system so the final product stays visually bold and operationally reliable."
-      />
-      <ServicesSection />
-      <SiteFooter />
+      <PageIntro {...siteContent.pageIntros.services} />
+      <ServicesSection content={siteContent.services} />
+      <SiteFooter contactEmail={siteContent.contact.email} />
     </main>
   );
 }

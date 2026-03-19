@@ -1,40 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  aboutBullets,
   aboutImageOne,
   aboutImageTwo,
-  faqItems,
   heroImage,
-  insights,
   navItems,
-  processSteps,
-  services,
+  type InsightItem,
+  type PageIntroContent,
+  type SiteContent,
 } from "../lib/site-data";
 
-export function SiteHeader() {
-  return (
-    <header className="topbar">
-      <nav className="shell nav">
-        <Link className="brand" href="/">
-          RUNOK
-        </Link>
-        <div className="nav-links">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              {item.label}
-            </Link>
-          ))}
-        </div>
-        <Link className="button button-primary button-small" href="/contact">
-          Get in Touch
-        </Link>
-      </nav>
-    </header>
-  );
-}
+export { SiteHeader } from "./site-header";
 
-export function SiteFooter() {
+export function SiteFooter({ contactEmail }: { contactEmail: string }) {
   return (
     <footer className="footer">
       <div className="shell footer-grid">
@@ -47,7 +25,7 @@ export function SiteFooter() {
             editorial precision.
           </p>
           <div className="social-row">
-            <a href="mailto:hello@runok.agency" aria-label="Email">
+            <a href={`mailto:${contactEmail}`} aria-label="Email">
               @
             </a>
             <Link href="/" aria-label="Website">
@@ -83,15 +61,7 @@ export function SiteFooter() {
   );
 }
 
-export function PageIntro({
-  eyebrow,
-  title,
-  description,
-}: {
-  eyebrow: string;
-  title: string;
-  description: string;
-}) {
+export function PageIntro({ eyebrow, title, description }: PageIntroContent) {
   return (
     <section className="page-intro shell">
       <span className="eyebrow">{eyebrow}</span>
@@ -101,19 +71,15 @@ export function PageIntro({
   );
 }
 
-export function HeroSection() {
+export function HeroSection({ content }: { content: SiteContent["homeHero"] }) {
   return (
     <section className="hero shell">
       <div className="hero-copy">
-        <span className="eyebrow">Premium Web Agency</span>
+        <span className="eyebrow">{content.eyebrow}</span>
         <h1>
-          Transforming <br /> Visions into <br /> <span>Digital Reality</span>
+          {content.title} <br /> <span>{content.highlight}</span>
         </h1>
-        <p>
-          We create high-end editorial digital experiences that redefine how
-          brands connect with their audience. Precise, bold, and unapologetically
-          modern.
-        </p>
+        <p>{content.description}</p>
         <div className="hero-actions">
           <Link className="button button-primary" href="/contact">
             Start Project
@@ -140,24 +106,21 @@ export function HeroSection() {
   );
 }
 
-export function ServicesSection() {
+export function ServicesSection({ content }: { content: SiteContent["services"] }) {
   return (
     <section className="section section-muted">
       <div className="shell">
         <div className="section-heading split">
           <div>
             <span className="eyebrow">Expertise</span>
-            <h2>Our Core Services</h2>
+            <h2>{content.heading}</h2>
           </div>
-          <p>
-            Tailored solutions that merge technical excellence with visual
-            storytelling.
-          </p>
+          <p>{content.intro}</p>
         </div>
         <div className="service-grid">
-          {services.map((service) => (
+          {content.items.map((service) => (
             <article className="service-card" key={service.title}>
-              <div className="icon-badge">{service.icon}</div>
+              <div className="icon-badge">{service.icon ?? "Item"}</div>
               <h3>{service.title}</h3>
               <p>{service.description}</p>
             </article>
@@ -168,7 +131,7 @@ export function ServicesSection() {
   );
 }
 
-export function AboutSection() {
+export function AboutSection({ content }: { content: SiteContent["about"] }) {
   return (
     <section className="section">
       <div className="shell about-grid">
@@ -199,14 +162,10 @@ export function AboutSection() {
 
         <div className="about-copy">
           <span className="eyebrow">Who we are</span>
-          <h2>We are a team of curators, designers, and developers.</h2>
-          <p>
-            Founded on the principle of editorial excellence, Runok helps
-            visionary companies create digital assets that stand the test of time.
-            We do not just build websites; we curate digital ecosystems.
-          </p>
+          <h2>{content.title}</h2>
+          <p>{content.description}</p>
           <ul className="check-list">
-            {aboutBullets.map((bullet) => (
+            {content.bullets.map((bullet) => (
               <li key={bullet}>{bullet}</li>
             ))}
           </ul>
@@ -219,19 +178,19 @@ export function AboutSection() {
   );
 }
 
-export function ProcessSection() {
+export function ProcessSection({ content }: { content: SiteContent["process"] }) {
   return (
     <section className="section section-process">
       <div className="shell">
         <div className="section-heading centered">
           <span className="eyebrow">Our Methodology</span>
-          <h2>How We Work</h2>
+          <h2>{content.heading}</h2>
         </div>
         <div className="process-grid">
-          {processSteps.map((step) => (
-            <article className="process-step" key={step.number}>
+          {content.items.map((step, index) => (
+            <article className="process-step" key={`${step.title}-${index}`}>
               <div className={step.highlighted ? "step-badge active" : "step-badge"}>
-                {step.number}
+                {step.number ?? `${index + 1}`.padStart(2, "0")}
               </div>
               <h3>{step.title}</h3>
               <p>{step.description}</p>
@@ -243,16 +202,16 @@ export function ProcessSection() {
   );
 }
 
-export function FaqSection() {
+export function FaqSection({ content }: { content: SiteContent["faq"] }) {
   return (
     <section className="section">
       <div className="shell faq-shell">
         <div className="section-heading centered">
           <span className="eyebrow">Knowledge Base</span>
-          <h2>Common Questions</h2>
+          <h2>{content.heading}</h2>
         </div>
         <div className="faq-list">
-          {faqItems.map((item) => (
+          {content.items.map((item) => (
             <details className="faq-item" key={item.question} open={item.open}>
               <summary>
                 <span>{item.question}</span>
@@ -267,7 +226,7 @@ export function FaqSection() {
   );
 }
 
-export function InsightsSection() {
+export function InsightsSection({ posts }: { posts: InsightItem[] }) {
   return (
     <section className="section section-insights">
       <div className="shell">
@@ -278,7 +237,7 @@ export function InsightsSection() {
           </Link>
         </div>
         <div className="insight-grid">
-          {insights.map((post) => (
+          {posts.map((post) => (
             <article className="insight-card" key={post.title}>
               <div className="insight-image">
                 <Image src={post.image} alt={post.alt} width={600} height={360} />

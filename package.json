@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "wp:serve": "php -S localhost:8090 -t wordpress/public wordpress/router.php"
   },
   "dependencies": {
     "next": "^15.5.13",

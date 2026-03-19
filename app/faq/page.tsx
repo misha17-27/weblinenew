@@ -4,18 +4,17 @@ import {
   SiteFooter,
   SiteHeader,
 } from "../components/site-sections";
+import { getSiteContent } from "../lib/wordpress";
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const siteContent = await getSiteContent();
+
   return (
     <main className="page-shell">
       <SiteHeader />
-      <PageIntro
-        eyebrow="FAQ"
-        title="Common questions, project expectations, and delivery details."
-        description="The FAQ now lives on its own route, which makes it easier to expand into a full support or pre-sales knowledge base."
-      />
-      <FaqSection />
-      <SiteFooter />
+      <PageIntro {...siteContent.pageIntros.faq} />
+      <FaqSection content={siteContent.faq} />
+      <SiteFooter contactEmail={siteContent.contact.email} />
     </main>
   );
 }

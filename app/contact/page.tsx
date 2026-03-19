@@ -4,45 +4,39 @@ import {
   SiteFooter,
   SiteHeader,
 } from "../components/site-sections";
+import { getSiteContent } from "../lib/wordpress";
 
-const contactDetails = [
-  {
-    label: "Email",
-    value: "hello@runok.agency",
-    href: "mailto:hello@runok.agency",
-  },
-  {
-    label: "Phone",
-    value: "+994 50 555 12 12",
-    href: "tel:+994505551212",
-  },
-  {
-    label: "Office",
-    value: "Baku, Azerbaijan",
-    href: "https://maps.google.com/?q=Baku,Azerbaijan",
-  },
-];
+export default async function ContactPage() {
+  const siteContent = await getSiteContent();
+  const contactDetails = [
+    {
+      label: "Email",
+      value: siteContent.contact.email,
+      href: `mailto:${siteContent.contact.email}`,
+    },
+    {
+      label: "Phone",
+      value: siteContent.contact.phone,
+      href: `tel:${siteContent.contact.phone.replace(/\s+/g, "")}`,
+    },
+    {
+      label: "Office",
+      value: siteContent.contact.office,
+      href: siteContent.contact.mapUrl,
+    },
+  ];
 
-export default function ContactPage() {
   return (
     <main className="page-shell">
       <SiteHeader />
-      <PageIntro
-        eyebrow="Contact"
-        title="Let us discuss the next digital system your brand actually needs."
-        description="Use the contact page for project requests, partnerships, and strategic conversations. The form is ready for backend wiring when you decide where submissions should go."
-      />
+      <PageIntro {...siteContent.pageIntros.contact} />
 
       <section className="section">
         <div className="shell contact-layout">
           <div className="contact-panel">
             <span className="eyebrow">Contact details</span>
-            <h2>Direct lines for project inquiries and planning.</h2>
-            <p>
-              If the scope is still rough, that is fine. Send the business goal,
-              timeline, and what needs to change. We can structure the project
-              from there.
-            </p>
+            <h2>{siteContent.contact.panelTitle}</h2>
+            <p>{siteContent.contact.panelDescription}</p>
 
             <div className="contact-list">
               {contactDetails.map((item) => (
@@ -54,8 +48,8 @@ export default function ContactPage() {
             </div>
 
             <div className="contact-note">
-              <strong>Response window</strong>
-              <p>Most inquiries get a reply within one business day.</p>
+              <strong>{siteContent.contact.responseTitle}</strong>
+              <p>{siteContent.contact.responseText}</p>
             </div>
           </div>
 
@@ -115,11 +109,11 @@ export default function ContactPage() {
             <div className="map-card__header">
               <div>
                 <span className="eyebrow">Office map</span>
-                <h2>Find the studio in Baku.</h2>
+                <h2>{siteContent.contact.mapHeading}</h2>
               </div>
               <a
                 className="button button-outline"
-                href="https://maps.google.com/?q=Baku,Azerbaijan"
+                href={siteContent.contact.mapUrl}
                 rel="noreferrer"
                 target="_blank"
               >
@@ -130,7 +124,7 @@ export default function ContactPage() {
             <div className="map-frame">
               <iframe
                 title="RUNOK office map"
-                src="https://www.google.com/maps?q=Baku,Azerbaijan&z=13&output=embed"
+                src={siteContent.contact.embedUrl}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
@@ -139,7 +133,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <SiteFooter />
+      <SiteFooter contactEmail={siteContent.contact.email} />
     </main>
   );
 }

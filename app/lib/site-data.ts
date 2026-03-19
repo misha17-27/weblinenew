@@ -1,4 +1,78 @@
-export const navItems = [
+export type NavItem = {
+  label: string;
+  href: string;
+};
+
+export type SectionItem = {
+  icon?: string;
+  number?: string;
+  title: string;
+  description: string;
+  highlighted?: boolean;
+};
+
+export type FaqItem = {
+  question: string;
+  answer: string;
+  open?: boolean;
+};
+
+export type InsightItem = {
+  category: string;
+  date: string;
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
+};
+
+export type PageIntroContent = {
+  eyebrow: string;
+  title: string;
+  description: string;
+};
+
+export type SiteContent = {
+  homeHero: {
+    eyebrow: string;
+    title: string;
+    highlight: string;
+    description: string;
+  };
+  services: {
+    heading: string;
+    intro: string;
+    items: SectionItem[];
+  };
+  about: {
+    title: string;
+    description: string;
+    bullets: string[];
+  };
+  process: {
+    heading: string;
+    items: SectionItem[];
+  };
+  faq: {
+    heading: string;
+    items: FaqItem[];
+  };
+  contact: {
+    email: string;
+    phone: string;
+    office: string;
+    mapUrl: string;
+    embedUrl: string;
+    panelTitle: string;
+    panelDescription: string;
+    responseTitle: string;
+    responseText: string;
+    mapHeading: string;
+  };
+  pageIntros: Record<string, PageIntroContent>;
+};
+
+export const navItems: NavItem[] = [
   { label: "Services", href: "/services" },
   { label: "Process", href: "/process" },
   { label: "About", href: "/about" },
@@ -7,78 +81,7 @@ export const navItems = [
   { label: "Contact", href: "/contact" },
 ];
 
-export const services = [
-  {
-    icon: "Brand",
-    title: "Designing",
-    description:
-      "Visual identities that command attention and define industry standards.",
-  },
-  {
-    icon: "Code",
-    title: "Development",
-    description:
-      "Robust architecture built with modern frameworks for ultimate speed.",
-  },
-  {
-    icon: "UX",
-    title: "User Experience",
-    description:
-      "Intuitive journeys crafted through psychological research and testing.",
-  },
-  {
-    icon: "Mobile",
-    title: "Mobile Solution",
-    description:
-      "Native-feeling web applications optimized for every screen size.",
-  },
-];
-
-export const processSteps = [
-  {
-    number: "01",
-    title: "Project Processing",
-    description: "Initial research and deep dive into your brand architecture.",
-  },
-  {
-    number: "02",
-    title: "High Quality Products",
-    description: "Iteration-driven design and rapid prototyping phase.",
-  },
-  {
-    number: "03",
-    title: "Huge Choice Products",
-    description:
-      "Exploration of multiple creative directions and refinements.",
-  },
-  {
-    number: "04",
-    title: "Quality Finished",
-    description: "Final deployment with rigorous QA and performance checks.",
-    highlighted: true,
-  },
-];
-
-export const faqItems = [
-  {
-    question: "What is your typical project timeline?",
-    answer:
-      "Most bespoke projects take between 8 to 12 weeks from discovery to launch, depending on complexity and scope of technical integrations.",
-    open: true,
-  },
-  {
-    question: "Do you offer post-launch support?",
-    answer:
-      "Yes. We provide structured post-launch support retainers that cover iteration, monitoring, and optimization.",
-  },
-  {
-    question: "How do you handle branding vs. development?",
-    answer:
-      "Brand strategy, design systems, and engineering are handled as one workflow so the final product stays coherent.",
-  },
-];
-
-export const insights = [
+export const fallbackInsights: InsightItem[] = [
   {
     category: "Design",
     date: "May 12, 2024",
@@ -111,11 +114,158 @@ export const insights = [
   },
 ];
 
-export const aboutBullets = [
-  "Strategic Digital Consulting",
-  "Award-winning Visual Design",
-  "Scalable Enterprise Development",
-];
+export const fallbackSiteContent: SiteContent = {
+  homeHero: {
+    eyebrow: "Premium Web Agency",
+    title: "Transforming Visions into",
+    highlight: "Digital Reality",
+    description:
+      "We create high-end editorial digital experiences that redefine how brands connect with their audience. Precise, bold, and unapologetically modern.",
+  },
+  services: {
+    heading: "Our Core Services",
+    intro:
+      "Tailored solutions that merge technical excellence with visual storytelling.",
+    items: [
+      {
+        icon: "Brand",
+        title: "Designing",
+        description:
+          "Visual identities that command attention and define industry standards.",
+      },
+      {
+        icon: "Code",
+        title: "Development",
+        description:
+          "Robust architecture built with modern frameworks for ultimate speed.",
+      },
+      {
+        icon: "UX",
+        title: "User Experience",
+        description:
+          "Intuitive journeys crafted through psychological research and testing.",
+      },
+      {
+        icon: "Mobile",
+        title: "Mobile Solution",
+        description:
+          "Native-feeling web applications optimized for every screen size.",
+      },
+    ],
+  },
+  about: {
+    title: "We are a team of curators, designers, and developers.",
+    description:
+      "Founded on the principle of editorial excellence, Runok helps visionary companies create digital assets that stand the test of time. We do not just build websites; we curate digital ecosystems.",
+    bullets: [
+      "Strategic Digital Consulting",
+      "Award-winning Visual Design",
+      "Scalable Enterprise Development",
+    ],
+  },
+  process: {
+    heading: "How We Work",
+    items: [
+      {
+        number: "01",
+        title: "Project Processing",
+        description: "Initial research and deep dive into your brand architecture.",
+      },
+      {
+        number: "02",
+        title: "High Quality Products",
+        description: "Iteration-driven design and rapid prototyping phase.",
+      },
+      {
+        number: "03",
+        title: "Huge Choice Products",
+        description:
+          "Exploration of multiple creative directions and refinements.",
+      },
+      {
+        number: "04",
+        title: "Quality Finished",
+        description: "Final deployment with rigorous QA and performance checks.",
+        highlighted: true,
+      },
+    ],
+  },
+  faq: {
+    heading: "Common Questions",
+    items: [
+      {
+        question: "What is your typical project timeline?",
+        answer:
+          "Most bespoke projects take between 8 to 12 weeks from discovery to launch, depending on complexity and scope of technical integrations.",
+        open: true,
+      },
+      {
+        question: "Do you offer post-launch support?",
+        answer:
+          "Yes. We provide structured post-launch support retainers that cover iteration, monitoring, and optimization.",
+      },
+      {
+        question: "How do you handle branding vs. development?",
+        answer:
+          "Brand strategy, design systems, and engineering are handled as one workflow so the final product stays coherent.",
+      },
+    ],
+  },
+  contact: {
+    email: "hello@runok.agency",
+    phone: "+994 50 555 12 12",
+    office: "Baku, Azerbaijan",
+    mapUrl: "https://maps.google.com/?q=Baku,Azerbaijan",
+    embedUrl: "https://www.google.com/maps?q=Baku,Azerbaijan&z=13&output=embed",
+    panelTitle: "Direct lines for project inquiries and planning.",
+    panelDescription:
+      "If the scope is still rough, that is fine. Send the business goal, timeline, and what needs to change. We can structure the project from there.",
+    responseTitle: "Response window",
+    responseText: "Most inquiries get a reply within one business day.",
+    mapHeading: "Find the studio in Baku.",
+  },
+  pageIntros: {
+    services: {
+      eyebrow: "Services",
+      title: "Specialized services for brands that want a sharper digital presence.",
+      description:
+        "Design, engineering, and UX are handled as one system so the final product stays visually bold and operationally reliable.",
+    },
+    process: {
+      eyebrow: "Process",
+      title:
+        "A production workflow designed to keep strategy, design, and delivery aligned.",
+      description:
+        "Every stage reduces ambiguity: discovery, iteration, refinement, and launch are treated as one continuous system.",
+    },
+    about: {
+      eyebrow: "About",
+      title:
+        "RUNOK is built for companies that care about design precision and technical execution.",
+      description:
+        "We combine brand thinking, product design, and modern frontend engineering into a single editorial-grade delivery process.",
+    },
+    portfolio: {
+      eyebrow: "Portfolio",
+      title:
+        "Selected insights and case-study style content for a premium agency presentation.",
+      description:
+        "This page can later be replaced with CMS-backed projects, but it is already split into its own route and ready for expansion.",
+    },
+    faq: {
+      eyebrow: "FAQ",
+      title: "Common questions, project expectations, and delivery details.",
+      description:
+        "The FAQ now lives on its own route, which makes it easier to expand into a full support or pre-sales knowledge base.",
+    },
+    contact: {
+      eyebrow: "Contact",
+      title: "Let us discuss the next digital system your brand actually needs.",
+      description:
+        "Use the contact page for project requests, partnerships, and strategic conversations. The form is ready for backend wiring when you decide where submissions should go.",
+    },
+  },
+};
 
 export const heroImage =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuAD8iKMi7z_oenBDR6oXzPz-LalVCo0TITLEtjUyXLhsqlqO78BCgcxKNqgzZDM-9fxTPvdFpMNvIjC1sUXdpPJYksxK3J-B6DuNUbsu0cdO25keNFzQBRK3H19f13nL7WDJe-BIBZNnPUwIyPXB4sdbQK-t52-jHIurlgmVFfgJVadd-k3zGJMAAAszp4ck52MatKusut7nUT0oaScPUc4SoP2XpeOyjct3CVZ1zuHjaDdmKvnLWQWA62A5Fe_XUhF7etd6pa0kok";

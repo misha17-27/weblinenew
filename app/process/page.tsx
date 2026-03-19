@@ -4,18 +4,17 @@ import {
   SiteFooter,
   SiteHeader,
 } from "../components/site-sections";
+import { getSiteContent } from "../lib/wordpress";
 
-export default function ProcessPage() {
+export default async function ProcessPage() {
+  const siteContent = await getSiteContent();
+
   return (
     <main className="page-shell">
       <SiteHeader />
-      <PageIntro
-        eyebrow="Process"
-        title="A production workflow designed to keep strategy, design, and delivery aligned."
-        description="Every stage reduces ambiguity: discovery, iteration, refinement, and launch are treated as one continuous system."
-      />
-      <ProcessSection />
-      <SiteFooter />
+      <PageIntro {...siteContent.pageIntros.process} />
+      <ProcessSection content={siteContent.process} />
+      <SiteFooter contactEmail={siteContent.contact.email} />
     </main>
   );
 }
