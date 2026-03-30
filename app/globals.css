@@ -159,37 +159,35 @@ html[data-theme="dark"] .brand-logo {
   box-shadow: 0 14px 36px rgba(18, 26, 45, 0.08);
 }
 
-.nav-locale__globe {
-  width: 0.95rem;
-  height: 0.95rem;
-  border: 1.6px solid currentColor;
-  border-radius: 999px;
-  position: relative;
+.header-icon {
+  display: block;
+  flex-shrink: 0;
+  stroke: currentColor;
 }
 
-.nav-locale__globe::before,
-.nav-locale__globe::after {
-  content: "";
-  position: absolute;
-  inset: 0.16rem;
-  border: 1px solid currentColor;
-  border-top: 0;
-  border-bottom: 0;
-  border-radius: 999px;
+.header-icon--globe {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.nav-locale__globe::after {
-  inset: 0.38rem 0.08rem;
-  border-left: 0;
-  border-right: 0;
+.header-icon--caret {
+  width: 0.75rem;
+  height: 0.75rem;
+  opacity: 0.5;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.nav-locale__caret {
-  width: 0.45rem;
-  height: 0.45rem;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  transform: rotate(45deg) translateY(-1px);
+.header-icon--theme {
+  width: 1.125rem;
+  height: 1.125rem;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .nav-locale__menu {
@@ -264,36 +262,6 @@ html[data-theme="dark"] .brand-logo {
 
 html[data-theme="dark"] .theme-toggle:hover {
   background: rgba(255, 255, 255, 0.06);
-}
-
-.theme-toggle__icon {
-  position: relative;
-  width: 1rem;
-  height: 1rem;
-  display: inline-block;
-}
-
-.theme-toggle__icon.is-moon {
-  border: 1.8px solid currentColor;
-  border-radius: 999px;
-  border-top-color: transparent;
-  border-right-color: transparent;
-  transform: rotate(-35deg);
-}
-
-.theme-toggle__icon.is-sun {
-  border: 1.8px solid currentColor;
-  border-radius: 999px;
-}
-
-.theme-toggle__icon.is-sun::before,
-.theme-toggle__icon.is-sun::after {
-  content: "";
-  position: absolute;
-  inset: -0.32rem;
-  border-radius: 999px;
-  border: 1px dashed currentColor;
-  opacity: 0.6;
 }
 
 .nav-toggle,

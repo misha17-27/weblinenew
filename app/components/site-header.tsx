@@ -126,6 +126,72 @@ const chromeByLocale: Record<
   },
 };
 
+function GlobeIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="header-icon header-icon--globe"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+      <path d="M2 12h20" />
+    </svg>
+  );
+}
+
+function ChevronDownIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="header-icon header-icon--caret"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="header-icon header-icon--theme"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M12 3a6.36 6.36 0 0 0 9 9A9 9 0 1 1 12 3Z" />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="header-icon header-icon--theme"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2" />
+      <path d="M12 20v2" />
+      <path d="m4.93 4.93 1.41 1.41" />
+      <path d="m17.66 17.66 1.41 1.41" />
+      <path d="M2 12h2" />
+      <path d="M20 12h2" />
+      <path d="m6.34 17.66-1.41 1.41" />
+      <path d="m19.07 4.93-1.41 1.41" />
+    </svg>
+  );
+}
+
 export function SiteHeader() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -219,9 +285,9 @@ export function SiteHeader() {
               aria-label={chromeLabels.language}
               onClick={() => setLocaleOpen((open) => !open)}
             >
-              <span className="nav-locale__globe" aria-hidden="true" />
+              <GlobeIcon />
               <span>{activeLocale.short}</span>
-              <span className="nav-locale__caret" aria-hidden="true" />
+              <ChevronDownIcon />
             </button>
 
             <div className={localeOpen ? "nav-locale__menu is-open" : "nav-locale__menu"}>
@@ -252,7 +318,7 @@ export function SiteHeader() {
             aria-label={theme === "light" ? chromeLabels.themeLight : chromeLabels.themeDark}
             onClick={() => setTheme((current) => (current === "light" ? "dark" : "light"))}
           >
-            <span className={theme === "dark" ? "theme-toggle__icon is-sun" : "theme-toggle__icon is-moon"} />
+            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
           </button>
 
           <button
@@ -319,7 +385,7 @@ export function SiteHeader() {
               aria-label={theme === "light" ? chromeLabels.themeLight : chromeLabels.themeDark}
               onClick={() => setTheme((current) => (current === "light" ? "dark" : "light"))}
             >
-              <span className={theme === "dark" ? "theme-toggle__icon is-sun" : "theme-toggle__icon is-moon"} />
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
               <span>{theme === "light" ? chromeLabels.themeLight : chromeLabels.themeDark}</span>
             </button>
 
