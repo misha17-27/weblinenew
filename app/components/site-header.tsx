@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { WeblineLogo } from "./webline-logo";
 
 type LocaleCode = "az" | "en" | "ru" | "de" | "tr";
+type ThemeMode = "light" | "dark";
 
 type LocaleOption = {
   code: LocaleCode;
@@ -69,6 +70,8 @@ const chromeByLocale: Record<
     openMenu: string;
     closeMenu: string;
     language: string;
+    themeLight: string;
+    themeDark: string;
   }
 > = {
   az: {
@@ -78,6 +81,8 @@ const chromeByLocale: Record<
     openMenu: "Menyunu aç",
     closeMenu: "Menyunu bağla",
     language: "Dil seçimi",
+    themeLight: "Qaranlıq rejimi aktiv et",
+    themeDark: "İşıqlı rejimi aktiv et",
   },
   en: {
     contactLabel: "Contact",
@@ -86,6 +91,8 @@ const chromeByLocale: Record<
     openMenu: "Open menu",
     closeMenu: "Close menu",
     language: "Language selector",
+    themeLight: "Switch to dark mode",
+    themeDark: "Switch to light mode",
   },
   ru: {
     contactLabel: "Контакты",
@@ -94,6 +101,8 @@ const chromeByLocale: Record<
     openMenu: "Открыть меню",
     closeMenu: "Закрыть меню",
     language: "Выбор языка",
+    themeLight: "Включить тёмную тему",
+    themeDark: "Включить светлую тему",
   },
   de: {
     contactLabel: "Kontakt",
@@ -102,6 +111,8 @@ const chromeByLocale: Record<
     openMenu: "Menü öffnen",
     closeMenu: "Menü schließen",
     language: "Sprachauswahl",
+    themeLight: "Dunkelmodus aktivieren",
+    themeDark: "Hellmodus aktivieren",
   },
   tr: {
     contactLabel: "İletişim",
@@ -110,6 +121,8 @@ const chromeByLocale: Record<
     openMenu: "Menüyü aç",
     closeMenu: "Menüyü kapat",
     language: "Dil seçici",
+    themeLight: "Karanlık moda geç",
+    themeDark: "Aydınlık moda geç",
   },
 };
 
@@ -118,6 +131,7 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [localeOpen, setLocaleOpen] = useState(false);
   const [locale, setLocale] = useState<LocaleCode>("az");
+  const [theme, setTheme] = useState<ThemeMode>("light");
 
   const navItems = useMemo(() => navByLocale[locale], [locale]);
   const chromeLabels = chromeByLocale[locale];
@@ -126,9 +140,17 @@ export function SiteHeader() {
 
   useEffect(() => {
     const savedLocale = window.localStorage.getItem("webline-locale") as LocaleCode | null;
+    const savedTheme = window.localStorage.getItem("webline-theme") as ThemeMode | null;
 
     if (savedLocale && savedLocale in navByLocale) {
       setLocale(savedLocale);
+    }
+
+    if (savedTheme === "dark" || savedTheme === "light") {
+      setTheme(savedTheme);
+      document.documentElement.dataset.theme = savedTheme;
+    } else {
+      document.documentElement.dataset.theme = "light";
     }
   }, []);
 
@@ -140,6 +162,11 @@ export function SiteHeader() {
   useEffect(() => {
     window.localStorage.setItem("webline-locale", locale);
   }, [locale]);
+
+  useEffect(() => {
+    window.localStorage.setItem("webline-theme", theme);
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -220,6 +247,15 @@ export function SiteHeader() {
           </div>
 
           <button
+            type="button"
+            className="theme-toggle"
+            aria-label={theme === "light" ? chromeLabels.themeLight : chromeLabels.themeDark}
+            onClick={() => setTheme((current) => (current === "light" ? "dark" : "light"))}
+          >
+            <span className={theme === "dark" ? "theme-toggle__icon is-sun" : "theme-toggle__icon is-moon"} />
+          </button>
+
+          <button
             aria-controls="mobile-menu"
             aria-expanded={menuOpen}
             aria-label={menuOpen ? chromeLabels.closeMenu : chromeLabels.openMenu}
@@ -276,18 +312,30 @@ export function SiteHeader() {
             ))}
           </div>
 
-          <div className="nav-panel__languages">
-            {localeOptions.map((option) => (
-              <button
-                key={option.code}
-                type="button"
-                className={option.code === locale ? "nav-panel__language is-active" : "nav-panel__language"}
-                onClick={() => setLocale(option.code)}
-              >
-                <span>{option.label}</span>
-                <strong>{option.short}</strong>
-              </button>
-            ))}
+          <div className="nav-panel__tools">
+            <button
+              type="button"
+              className="theme-toggle nav-panel__theme-toggle"
+              aria-label={theme === "light" ? chromeLabels.themeLight : chromeLabels.themeDark}
+              onClick={() => setTheme((current) => (current === "light" ? "dark" : "light"))}
+            >
+              <span className={theme === "dark" ? "theme-toggle__icon is-sun" : "theme-toggle__icon is-moon"} />
+              <span>{theme === "light" ? chromeLabels.themeLight : chromeLabels.themeDark}</span>
+            </button>
+
+            <div className="nav-panel__languages">
+              {localeOptions.map((option) => (
+                <button
+                  key={option.code}
+                  type="button"
+                  className={option.code === locale ? "nav-panel__language is-active" : "nav-panel__language"}
+                  onClick={() => setLocale(option.code)}
+                >
+                  <span>{option.label}</span>
+                  <strong>{option.short}</strong>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="nav-panel__footer">
