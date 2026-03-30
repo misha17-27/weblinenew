@@ -13,8 +13,13 @@ export default async function ServicesPage() {
     <main className="page-shell">
       <SiteHeader />
       <PageIntro {...siteContent.pageIntros.services} />
-      <ServicesSection content={siteContent.services} />
-      <SiteFooter contactEmail={siteContent.contact.email} />
+      <ServicesSection content={siteContent.services} eyebrow={siteContent.pageIntros.services.eyebrow} />
+      <SiteFooter
+        contactEmail={siteContent.contact.email}
+        contactPhone={siteContent.contact.phone}
+        contactOffice={siteContent.contact.office}
+        description={siteContent.pageIntros.about.description}
+      />
     </main>
   );
 }

@@ -13,7 +13,17 @@ import { WeblineLogo } from "./webline-logo";
 
 export { SiteHeader } from "./site-header";
 
-export function SiteFooter({ contactEmail }: { contactEmail: string }) {
+export function SiteFooter({
+  contactEmail,
+  contactPhone,
+  contactOffice,
+  description,
+}: {
+  contactEmail: string;
+  contactPhone?: string;
+  contactOffice?: string;
+  description?: string;
+}) {
   return (
     <footer className="footer">
       <div className="shell footer-grid">
@@ -22,8 +32,8 @@ export function SiteFooter({ contactEmail }: { contactEmail: string }) {
             <WeblineLogo className="brand-logo brand-logo--footer" footer />
           </Link>
           <p>
-            Azərbaycanda və ondan kənarda müasir məhsullar, veb-saytlar və
-            böyümə yönümlü təcrübələr hazırlayan rəqəmsal agentlik.
+            {description ??
+              "Azərbaycanda və ondan kənarda müasir məhsullar, veb-saytlar və böyümə yönümlü təcrübələr hazırlayan rəqəmsal agentlik."}
           </p>
           <div className="social-row">
             <a href="https://facebook.com" aria-label="Facebook">
@@ -51,9 +61,10 @@ export function SiteFooter({ contactEmail }: { contactEmail: string }) {
         <div className="footer-links">
           <h4>Əlaqə</h4>
           <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
-          <a href="tel:+994123456789">+994 12 345 67 89</a>
-          <a href="tel:+994501234567">+994 50 123 45 67</a>
-          <span>Bakı, Azərbaycan</span>
+          {contactPhone ? (
+            <a href={`tel:${contactPhone.replace(/\s+/g, "")}`}>{contactPhone}</a>
+          ) : null}
+          {contactOffice ? <span>{contactOffice}</span> : null}
         </div>
       </div>
       <div className="shell footer-bottom">
@@ -112,13 +123,19 @@ export function HeroSection({ content }: { content: SiteContent["homeHero"] }) {
   );
 }
 
-export function ServicesSection({ content }: { content: SiteContent["services"] }) {
+export function ServicesSection({
+  content,
+  eyebrow = "Services",
+}: {
+  content: SiteContent["services"];
+  eyebrow?: string;
+}) {
   return (
     <section className="section section-muted">
       <div className="shell">
         <div className="section-heading split">
           <div>
-            <span className="eyebrow">Expertise</span>
+            <span className="eyebrow">{eyebrow}</span>
             <h2>{content.heading}</h2>
           </div>
           <p>{content.intro}</p>
@@ -137,7 +154,13 @@ export function ServicesSection({ content }: { content: SiteContent["services"] 
   );
 }
 
-export function AboutSection({ content }: { content: SiteContent["about"] }) {
+export function AboutSection({
+  content,
+  eyebrow = "About",
+}: {
+  content: SiteContent["about"];
+  eyebrow?: string;
+}) {
   return (
     <section className="section">
       <div className="shell about-grid">
@@ -167,7 +190,7 @@ export function AboutSection({ content }: { content: SiteContent["about"] }) {
         </div>
 
         <div className="about-copy">
-          <span className="eyebrow">Who we are</span>
+          <span className="eyebrow">{eyebrow}</span>
           <h2>{content.title}</h2>
           <p>{content.description}</p>
           <ul className="check-list">
@@ -184,12 +207,18 @@ export function AboutSection({ content }: { content: SiteContent["about"] }) {
   );
 }
 
-export function ProcessSection({ content }: { content: SiteContent["process"] }) {
+export function ProcessSection({
+  content,
+  eyebrow = "Process",
+}: {
+  content: SiteContent["process"];
+  eyebrow?: string;
+}) {
   return (
     <section className="section section-process">
       <div className="shell">
         <div className="section-heading centered">
-          <span className="eyebrow">Our Methodology</span>
+          <span className="eyebrow">{eyebrow}</span>
           <h2>{content.heading}</h2>
         </div>
         <div className="process-grid">
@@ -208,12 +237,18 @@ export function ProcessSection({ content }: { content: SiteContent["process"] })
   );
 }
 
-export function FaqSection({ content }: { content: SiteContent["faq"] }) {
+export function FaqSection({
+  content,
+  eyebrow = "FAQ",
+}: {
+  content: SiteContent["faq"];
+  eyebrow?: string;
+}) {
   return (
     <section className="section">
       <div className="shell faq-shell">
         <div className="section-heading centered">
-          <span className="eyebrow">Knowledge Base</span>
+          <span className="eyebrow">{eyebrow}</span>
           <h2>{content.heading}</h2>
         </div>
         <div className="faq-list">
@@ -232,12 +267,18 @@ export function FaqSection({ content }: { content: SiteContent["faq"] }) {
   );
 }
 
-export function InsightsSection({ posts }: { posts: InsightItem[] }) {
+export function InsightsSection({
+  posts,
+  heading = "Latest Insights",
+}: {
+  posts: InsightItem[];
+  heading?: string;
+}) {
   return (
     <section className="section section-insights">
       <div className="shell">
         <div className="section-heading split">
-          <h2>Latest Insights</h2>
+          <h2>{heading}</h2>
           <Link className="button button-link" href="/portfolio">
             View All Posts <span className="arrow">-&gt;</span>
           </Link>
@@ -263,18 +304,23 @@ export function InsightsSection({ posts }: { posts: InsightItem[] }) {
   );
 }
 
-export function CtaStrip() {
+export function CtaStrip({
+  eyebrow = "Contact",
+  title,
+  description,
+}: {
+  eyebrow?: string;
+  title: string;
+  description: string;
+}) {
   return (
     <section className="section">
       <div className="shell">
         <div className="cta-strip">
           <div>
-            <span className="eyebrow">Start a project</span>
-            <h2>Need the same design, but as a full agency website?</h2>
-            <p>
-              Separate pages are ready. The next step is wiring forms, CMS
-              content, and real portfolio entries.
-            </p>
+            <span className="eyebrow">{eyebrow}</span>
+            <h2>{title}</h2>
+            <p>{description}</p>
           </div>
           <div className="button-row">
             <Link className="button button-primary" href="/services">

@@ -13,8 +13,13 @@ export default async function AboutPage() {
     <main className="page-shell">
       <SiteHeader />
       <PageIntro {...siteContent.pageIntros.about} />
-      <AboutSection content={siteContent.about} />
-      <SiteFooter contactEmail={siteContent.contact.email} />
+      <AboutSection content={siteContent.about} eyebrow={siteContent.pageIntros.about.eyebrow} />
+      <SiteFooter
+        contactEmail={siteContent.contact.email}
+        contactPhone={siteContent.contact.phone}
+        contactOffice={siteContent.contact.office}
+        description={siteContent.pageIntros.about.description}
+      />
     </main>
   );
 }

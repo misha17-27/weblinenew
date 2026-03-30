@@ -13,8 +13,13 @@ export default async function FaqPage() {
     <main className="page-shell">
       <SiteHeader />
       <PageIntro {...siteContent.pageIntros.faq} />
-      <FaqSection content={siteContent.faq} />
-      <SiteFooter contactEmail={siteContent.contact.email} />
+      <FaqSection content={siteContent.faq} eyebrow={siteContent.pageIntros.faq.eyebrow} />
+      <SiteFooter
+        contactEmail={siteContent.contact.email}
+        contactPhone={siteContent.contact.phone}
+        contactOffice={siteContent.contact.office}
+        description={siteContent.pageIntros.about.description}
+      />
     </main>
   );
 }

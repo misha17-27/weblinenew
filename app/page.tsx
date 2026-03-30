@@ -143,7 +143,12 @@ export default async function Home() {
         </Link>
       </section>
 
-      <SiteFooter contactEmail={content.contact.email} />
+      <SiteFooter
+        contactEmail={content.contact.email}
+        contactPhone={content.contact.phone}
+        contactOffice={content.contact.office}
+        description={content.pageIntros.about.description}
+      />
     </main>
   );
 }

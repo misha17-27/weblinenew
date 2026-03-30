@@ -13,8 +13,13 @@ export default async function ProcessPage() {
     <main className="page-shell">
       <SiteHeader />
       <PageIntro {...siteContent.pageIntros.process} />
-      <ProcessSection content={siteContent.process} />
-      <SiteFooter contactEmail={siteContent.contact.email} />
+      <ProcessSection content={siteContent.process} eyebrow={siteContent.pageIntros.process.eyebrow} />
+      <SiteFooter
+        contactEmail={siteContent.contact.email}
+        contactPhone={siteContent.contact.phone}
+        contactOffice={siteContent.contact.office}
+        description={siteContent.pageIntros.about.description}
+      />
     </main>
   );
 }

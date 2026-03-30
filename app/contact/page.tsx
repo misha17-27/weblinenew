@@ -133,7 +133,12 @@ export default async function ContactPage() {
         </div>
       </section>
 
-      <SiteFooter contactEmail={siteContent.contact.email} />
+      <SiteFooter
+        contactEmail={siteContent.contact.email}
+        contactPhone={siteContent.contact.phone}
+        contactOffice={siteContent.contact.office}
+        description={siteContent.pageIntros.about.description}
+      />
     </main>
   );
 }

@@ -8,9 +8,9 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "RUNOK Agency | Transforming Visions into Digital Reality",
+  title: "Webline | Digital Experiences",
   description:
-    "Premium web agency landing page for RUNOK, focused on editorial digital experiences.",
+    "Webline digital agency website powered by a headless WordPress CMS.",
 };
 
 export default function RootLayout({
