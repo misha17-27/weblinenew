@@ -3,17 +3,143 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
-import { useEffect, useState } from "react";
-import { navItems } from "../lib/site-data";
+import { useEffect, useMemo, useState } from "react";
 import { WeblineLogo } from "./webline-logo";
+
+type LocaleCode = "az" | "en" | "ru" | "de" | "tr";
+
+type LocaleOption = {
+  code: LocaleCode;
+  label: string;
+  short: string;
+};
+
+const localeOptions: LocaleOption[] = [
+  { code: "az", label: "Azərbaycan", short: "AZ" },
+  { code: "en", label: "English", short: "EN" },
+  { code: "ru", label: "Русский", short: "RU" },
+  { code: "de", label: "Deutsch", short: "DE" },
+  { code: "tr", label: "Türkçe", short: "TR" },
+];
+
+const navByLocale: Record<LocaleCode, Array<{ href: string; label: string }>> = {
+  az: [
+    { href: "/portfolio", label: "Portfolio" },
+    { href: "/process", label: "Partnyorlar" },
+    { href: "/services", label: "Xidmətlər" },
+    { href: "/about", label: "Haqqımızda" },
+    { href: "/contact", label: "Əlaqə" },
+  ],
+  en: [
+    { href: "/portfolio", label: "Portfolio" },
+    { href: "/process", label: "Partners" },
+    { href: "/services", label: "Services" },
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
+  ],
+  ru: [
+    { href: "/portfolio", label: "Портфолио" },
+    { href: "/process", label: "Партнёры" },
+    { href: "/services", label: "Услуги" },
+    { href: "/about", label: "О нас" },
+    { href: "/contact", label: "Контакты" },
+  ],
+  de: [
+    { href: "/portfolio", label: "Portfolio" },
+    { href: "/process", label: "Partner" },
+    { href: "/services", label: "Leistungen" },
+    { href: "/about", label: "Über uns" },
+    { href: "/contact", label: "Kontakt" },
+  ],
+  tr: [
+    { href: "/portfolio", label: "Portföy" },
+    { href: "/process", label: "Partnerler" },
+    { href: "/services", label: "Hizmetler" },
+    { href: "/about", label: "Hakkımızda" },
+    { href: "/contact", label: "İletişim" },
+  ],
+};
+
+const chromeByLocale: Record<
+  LocaleCode,
+  {
+    contactLabel: string;
+    meta: string;
+    cta: string;
+    openMenu: string;
+    closeMenu: string;
+    language: string;
+  }
+> = {
+  az: {
+    contactLabel: "Əlaqə",
+    meta: "Veb saytlar, məhsul dizaynı və performans yönümlü rəqəmsal təcrübələr.",
+    cta: "Layihəyə Başla",
+    openMenu: "Menyunu aç",
+    closeMenu: "Menyunu bağla",
+    language: "Dil seçimi",
+  },
+  en: {
+    contactLabel: "Contact",
+    meta: "Websites, product design, and performance-first digital experiences.",
+    cta: "Start Project",
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
+    language: "Language selector",
+  },
+  ru: {
+    contactLabel: "Контакты",
+    meta: "Сайты, продуктовый дизайн и цифровые решения с упором на результат.",
+    cta: "Начать проект",
+    openMenu: "Открыть меню",
+    closeMenu: "Закрыть меню",
+    language: "Выбор языка",
+  },
+  de: {
+    contactLabel: "Kontakt",
+    meta: "Websites, Produktdesign und leistungsorientierte digitale Erlebnisse.",
+    cta: "Projekt starten",
+    openMenu: "Menü öffnen",
+    closeMenu: "Menü schließen",
+    language: "Sprachauswahl",
+  },
+  tr: {
+    contactLabel: "İletişim",
+    meta: "Web siteleri, ürün tasarımı ve performans odaklı dijital deneyimler.",
+    cta: "Projeye Başla",
+    openMenu: "Menüyü aç",
+    closeMenu: "Menüyü kapat",
+    language: "Dil seçici",
+  },
+};
 
 export function SiteHeader() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [localeOpen, setLocaleOpen] = useState(false);
+  const [locale, setLocale] = useState<LocaleCode>("az");
+
+  const navItems = useMemo(() => navByLocale[locale], [locale]);
+  const chromeLabels = chromeByLocale[locale];
+  const activeLocale =
+    localeOptions.find((option) => option.code === locale) ?? localeOptions[0];
+
+  useEffect(() => {
+    const savedLocale = window.localStorage.getItem("webline-locale") as LocaleCode | null;
+
+    if (savedLocale && savedLocale in navByLocale) {
+      setLocale(savedLocale);
+    }
+  }, []);
 
   useEffect(() => {
     setMenuOpen(false);
+    setLocaleOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    window.localStorage.setItem("webline-locale", locale);
+  }, [locale]);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -24,13 +150,10 @@ export function SiteHeader() {
   }, [menuOpen]);
 
   useEffect(() => {
-    if (!menuOpen) {
-      return;
-    }
-
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setMenuOpen(false);
+        setLocaleOpen(false);
       }
     };
 
@@ -39,7 +162,7 @@ export function SiteHeader() {
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [menuOpen]);
+  }, []);
 
   return (
     <header className="topbar">
@@ -61,15 +184,45 @@ export function SiteHeader() {
         </div>
 
         <div className="nav-actions">
-          <div className="nav-utility" aria-hidden="true">
-            <span>AZ</span>
-            <span>•</span>
-            <span>☾</span>
+          <div className="nav-locale">
+            <button
+              type="button"
+              className={localeOpen ? "nav-locale__trigger is-open" : "nav-locale__trigger"}
+              aria-expanded={localeOpen}
+              aria-label={chromeLabels.language}
+              onClick={() => setLocaleOpen((open) => !open)}
+            >
+              <span className="nav-locale__globe" aria-hidden="true" />
+              <span>{activeLocale.short}</span>
+              <span className="nav-locale__caret" aria-hidden="true" />
+            </button>
+
+            <div className={localeOpen ? "nav-locale__menu is-open" : "nav-locale__menu"}>
+              {localeOptions.map((option) => {
+                const isActive = option.code === locale;
+
+                return (
+                  <button
+                    key={option.code}
+                    type="button"
+                    className={isActive ? "nav-locale__option is-active" : "nav-locale__option"}
+                    onClick={() => {
+                      setLocale(option.code);
+                      setLocaleOpen(false);
+                    }}
+                  >
+                    <span>{option.label}</span>
+                    <strong>{option.short}</strong>
+                  </button>
+                );
+              })}
+            </div>
           </div>
+
           <button
             aria-controls="mobile-menu"
             aria-expanded={menuOpen}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-label={menuOpen ? chromeLabels.closeMenu : chromeLabels.openMenu}
             className={menuOpen ? "nav-toggle is-open" : "nav-toggle"}
             onClick={() => setMenuOpen((open) => !open)}
             type="button"
@@ -97,7 +250,7 @@ export function SiteHeader() {
           <div className="nav-panel__top">
             <WeblineLogo className="brand-logo" />
             <button
-              aria-label="Close menu"
+              aria-label={chromeLabels.closeMenu}
               className="nav-close"
               onClick={() => setMenuOpen(false)}
               type="button"
@@ -117,26 +270,37 @@ export function SiteHeader() {
               >
                 <span>{item.label}</span>
                 <span className="nav-panel__arrow" aria-hidden="true">
-                  ↗
+                  -&gt;
                 </span>
               </Link>
             ))}
           </div>
 
+          <div className="nav-panel__languages">
+            {localeOptions.map((option) => (
+              <button
+                key={option.code}
+                type="button"
+                className={option.code === locale ? "nav-panel__language is-active" : "nav-panel__language"}
+                onClick={() => setLocale(option.code)}
+              >
+                <span>{option.label}</span>
+                <strong>{option.short}</strong>
+              </button>
+            ))}
+          </div>
+
           <div className="nav-panel__footer">
             <div className="nav-panel__contact">
-              <span>Əlaqə</span>
+              <span>{chromeLabels.contactLabel}</span>
               <a href="mailto:info@webline.az">info@webline.az</a>
               <a href="tel:+994505551212">+994 50 555 12 12</a>
             </div>
-            <div className="nav-panel__meta">
-              Veb saytlar, məhsul dizaynı və performans yönümlü rəqəmsal
-              təcrübələr.
-            </div>
+            <div className="nav-panel__meta">{chromeLabels.meta}</div>
           </div>
 
           <Link className="button button-primary nav-panel__cta" href="/contact">
-            Layihəyə Başla
+            {chromeLabels.cta}
           </Link>
         </div>
       </div>
