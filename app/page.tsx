@@ -1,73 +1,39 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter, SiteHeader } from "./components/site-sections";
-import {
-  aboutImageOne,
-  aboutImageTwo,
-  fallbackInsights,
-  heroImage,
-} from "./lib/site-data";
+import { aboutImageOne, aboutImageTwo, heroImage } from "./lib/site-data";
+import { getInsights, getSiteContent } from "./lib/wordpress";
 
 const partnerLogos = ["SOCAR", "Azercell", "PASHA Bank", "Kapital Bank"];
 
-const capabilityItems = [
-  "Araşdırmaya əsaslanan UX dizayn metodologiyası",
-  "Miqyaslana bilən, dayanıqlı arxitektura",
-  "Performans odaklı mühəndislik yanaşması",
-  "Davamlı tərəfdaşlıq və iterasiya",
-];
+export default async function Home() {
+  const content = await getSiteContent();
+  const insights = await getInsights();
 
-const mosaicImages = [
-  { src: heroImage, alt: "Mountain landscape", tall: true },
-  { src: aboutImageTwo, alt: "Modern city architecture", tall: true },
-  { src: fallbackInsights[2].image, alt: fallbackInsights[2].alt, tall: true },
-  { src: fallbackInsights[0].image, alt: fallbackInsights[0].alt },
-  { src: fallbackInsights[1].image, alt: fallbackInsights[1].alt },
-  { src: aboutImageOne, alt: "Minimal workspace" },
-  { src: fallbackInsights[2].image, alt: "Abstract architecture" },
-  { src: heroImage, alt: "Blue gradient object" },
-];
+  const mosaicImages = [
+    { src: heroImage, alt: "Laptop interface", tall: true },
+    { src: aboutImageTwo, alt: "Interior", tall: true },
+    { src: insights[2]?.image ?? heroImage, alt: insights[2]?.alt ?? "Workspace", tall: true },
+    { src: insights[0]?.image ?? aboutImageOne, alt: insights[0]?.alt ?? "Team" },
+    { src: insights[1]?.image ?? aboutImageTwo, alt: insights[1]?.alt ?? "Charts" },
+    { src: aboutImageOne, alt: "Studio" },
+    { src: insights[2]?.image ?? heroImage, alt: "Display" },
+    { src: heroImage, alt: "Product" },
+  ];
 
-const featuredProjects = [
-  {
-    eyebrow: "E-ticarət platforması",
-    title: "Müasir Onlayn Bazar",
-    variant: "dark",
-  },
-  {
-    eyebrow: "SaaS idarə paneli",
-    title: "FinTech Analitika Paketi",
-    variant: "light",
-  },
-  {
-    eyebrow: "Sənaye",
-    title: "Xəstə İdarəetmə Portalı",
-    variant: "dark",
-  },
-] as const;
-
-export default function Home() {
   return (
     <main className="page-shell webline-page">
       <SiteHeader />
 
       <section className="webline-hero shell">
         <div className="webline-hero__copy">
-          <span className="eyebrow">Rəqəmsal agentlik</span>
+          <span className="eyebrow">{content.homeHero.eyebrow}</span>
           <h1>
-            Rəqəmsal
+            {content.homeHero.title}
             <br />
-            təcrübələr
-            <br />
-            yaradırıq
-            <br />
-            <em>nəticə verir</em>
+            <em>{content.homeHero.highlight}</em>
           </h1>
-          <p>
-            Xüsusi veb-saytlar, proqram həlləri və rəqəmsal strategiyalar.
-            İddialı bizneslərin böyüməsinə və fərqlənməsinə kömək etmək üçün
-            dəqiqliklə hazırlanmışdır.
-          </p>
+          <p>{content.homeHero.description}</p>
           <div className="hero-actions">
             <Link className="button button-accent" href="/contact">
               Layihəyə Başla →
@@ -108,13 +74,10 @@ export default function Home() {
       <section className="section webline-capabilities">
         <div className="shell section-heading split">
           <div>
-            <span className="eyebrow">Xidmətlər</span>
-            <h2>Hər bucağı əhatə edən imkanlar</h2>
+            <span className="eyebrow">{content.pageIntros.services.eyebrow}</span>
+            <h2>{content.services.heading}</h2>
           </div>
-          <p>
-            Konseptdən istifadəyə və sonrasına qədər ucdan-uca rəqəmsal
-            xidmətlər. Hər həll biznesiniz üçün hazırlanır.
-          </p>
+          <p>{content.services.intro}</p>
         </div>
       </section>
 
@@ -122,8 +85,8 @@ export default function Home() {
         <div className="shell">
           <div className="section-heading split">
             <div>
-              <span className="eyebrow">Seçilmiş işlər</span>
-              <h2>Özləri danışan layihələr</h2>
+              <span className="eyebrow">{content.pageIntros.portfolio.eyebrow}</span>
+              <h2>{content.pageIntros.portfolio.title}</h2>
             </div>
             <Link className="button button-outline" href="/portfolio">
               Bütün layihələr →
@@ -131,13 +94,9 @@ export default function Home() {
           </div>
 
           <div className="webline-project-grid">
-            {featuredProjects.map((project, index) => (
+            {insights.slice(0, 3).map((project, index) => (
               <article
-                className={
-                  index === 0
-                    ? `project-card project-card--large project-card--${project.variant}`
-                    : `project-card project-card--${project.variant}`
-                }
+                className={index === 0 ? "project-card project-card--large project-card--dark" : "project-card project-card--dark"}
                 key={project.title}
               >
                 <div className="project-browser">
@@ -145,9 +104,8 @@ export default function Home() {
                   <span />
                   <span />
                 </div>
-                <div className="project-visual" />
                 <div className="project-meta">
-                  <span>{project.eyebrow}</span>
+                  <span>{project.category}</span>
                   <h3>{project.title}</h3>
                 </div>
               </article>
@@ -159,23 +117,12 @@ export default function Home() {
       <section className="section webline-about">
         <div className="shell webline-about__grid">
           <div className="webline-about__copy">
-            <span className="eyebrow">Agentlik haqqında</span>
-            <h2>
-              Rəqəmsal
-              <br />
-              sənətkarlıq,
-              <br />
-              biznes təsiri
-            </h2>
-            <p>
-              Webline Bakıda yerləşən tam xidmətli rəqəmsal agentlikdir. Biz
-              müasir, funksional rəqəmsal məhsullar yaratmaq, performans
-              strategiyalarını dizayn etmək və bizneslərə onlayn dünyada rəqabət
-              aparmağa kömək etmək üçün işləyirik.
-            </p>
+            <span className="eyebrow">{content.pageIntros.about.eyebrow}</span>
+            <h2>{content.about.title}</h2>
+            <p>{content.about.description}</p>
 
             <ul className="webline-list">
-              {capabilityItems.map((item) => (
+              {content.about.bullets.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
@@ -189,21 +136,14 @@ export default function Home() {
       </section>
 
       <section className="webline-cta shell">
-        <h2>
-          Əla bir şey qurmağa
-          <br />
-          <em>hazırsınız?</em>
-        </h2>
-        <p>
-          Layihənizi müzakirə edək və rəqəmsal məqsədlərinizə necə çata
-          biləcəyinizi araşdıraq.
-        </p>
+        <h2>{content.contact.panelTitle}</h2>
+        <p>{content.contact.panelDescription}</p>
         <Link className="button button-accent" href="/contact">
           Konsultasiya rezerv edin →
         </Link>
       </section>
 
-      <SiteFooter contactEmail="info@webline.az" />
+      <SiteFooter contactEmail={content.contact.email} />
     </main>
   );
 }
