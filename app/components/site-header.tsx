@@ -25,38 +25,38 @@ const localeOptions: LocaleOption[] = [
 
 const navByLocale: Record<LocaleCode, Array<{ href: string; label: string }>> = {
   az: [
+    { href: "/about", label: "Haqqımızda" },
     { href: "/portfolio", label: "Portfolio" },
     { href: "/process", label: "Partnyorlar" },
     { href: "/services", label: "Xidmətlər" },
-    { href: "/about", label: "Haqqımızda" },
     { href: "/contact", label: "Əlaqə" },
   ],
   en: [
+    { href: "/about", label: "About" },
     { href: "/portfolio", label: "Portfolio" },
     { href: "/process", label: "Partners" },
     { href: "/services", label: "Services" },
-    { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
   ],
   ru: [
+    { href: "/about", label: "О нас" },
     { href: "/portfolio", label: "Портфолио" },
     { href: "/process", label: "Партнёры" },
     { href: "/services", label: "Услуги" },
-    { href: "/about", label: "О нас" },
     { href: "/contact", label: "Контакты" },
   ],
   de: [
+    { href: "/about", label: "Über uns" },
     { href: "/portfolio", label: "Portfolio" },
     { href: "/process", label: "Partner" },
     { href: "/services", label: "Leistungen" },
-    { href: "/about", label: "Über uns" },
     { href: "/contact", label: "Kontakt" },
   ],
   tr: [
+    { href: "/about", label: "Hakkımızda" },
     { href: "/portfolio", label: "Portföy" },
     { href: "/process", label: "Partnerler" },
     { href: "/services", label: "Hizmetler" },
-    { href: "/about", label: "Hakkımızda" },
     { href: "/contact", label: "İletişim" },
   ],
 };
