@@ -1,16 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
-export type ContactOffice = {
-  city: string;
-  country: string;
-  address: string;
-  phone: string;
-  email: string;
-  mapUrl: string;
-  embedUrl: string;
-};
+import type { ContactOffice } from "../lib/site-data";
 
 export function ContactOfficeTabs({
   offices,

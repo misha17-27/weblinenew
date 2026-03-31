@@ -1,4 +1,4 @@
-import { ContactOfficeTabs, type ContactOffice } from "../components/contact-office-tabs";
+import { ContactOfficeTabs } from "../components/contact-office-tabs";
 import { SiteFooter, SiteHeader } from "../components/site-sections";
 import { getMessages } from "../lib/messages";
 import { getCurrentLocale } from "../lib/request-locale";
@@ -8,48 +8,8 @@ export default async function ContactPage() {
   const locale = await getCurrentLocale();
   const t = getMessages(locale);
   const siteContent = await getSiteContent(locale);
-
-  const offices: ContactOffice[] = [
-    {
-      city: "Bakı",
-      country: "Azərbaycan",
-      address: "Heydər Əliyev prospekti 5",
-      phone: siteContent.contact.phone,
-      email: siteContent.contact.email,
-      mapUrl: siteContent.contact.mapUrl,
-      embedUrl: siteContent.contact.embedUrl,
-    },
-    {
-      city: "Berlin",
-      country: "Almaniya",
-      address: "Naugarder Strasse 46, 10409",
-      phone: "+49 176 75552813",
-      email: "info@thewebline.com",
-      mapUrl: "https://maps.google.com/?q=Naugarder+Strasse+46,+10409+Berlin",
-      embedUrl:
-        "https://www.google.com/maps?q=Naugarder+Strasse+46,+10409+Berlin&z=13&output=embed",
-    },
-    {
-      city: "Vyana",
-      country: "Avstriya",
-      address: "A-1110, Simmeringer Hauptstr.26IB",
-      phone: "+43 660 8600035",
-      email: "info@thewebline.com",
-      mapUrl: "https://maps.google.com/?q=Simmeringer+Hauptstrasse+26,+1110+Vienna",
-      embedUrl:
-        "https://www.google.com/maps?q=Simmeringer+Hauptstrasse+26,+1110+Vienna&z=13&output=embed",
-    },
-    {
-      city: "Budapeşt",
-      country: "Macarıstan",
-      address: "1051, Széchenyi István tér 7-8",
-      phone: "+36 30 336 6884",
-      email: "info@thewebline.com",
-      mapUrl: "https://maps.google.com/?q=Szechenyi+Istvan+ter+7-8,+1051+Budapest",
-      embedUrl:
-        "https://www.google.com/maps?q=Szechenyi+Istvan+ter+7-8,+1051+Budapest&z=13&output=embed",
-    },
-  ];
+  const offices = siteContent.offices;
+  const primaryOffice = offices[0];
 
   const officesHeading =
     locale === "en"
@@ -140,9 +100,11 @@ export default async function ContactPage() {
                 </div>
                 <div>
                   <small>{t.contact.address}</small>
-                  <strong>{offices[0].address}</strong>
+                  <strong>{primaryOffice?.address || siteContent.contact.office}</strong>
                   <span>
-                    {offices[0].city}, {offices[0].country}
+                    {primaryOffice
+                      ? `${primaryOffice.city}, ${primaryOffice.country}`
+                      : siteContent.contact.office}
                   </span>
                 </div>
               </div>

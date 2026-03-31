@@ -112,6 +112,7 @@ export async function getSiteContent(locale?: LocaleCode): Promise<SiteContent> 
       ...fallbackSiteContent.contact,
       ...data.contact,
     },
+    offices: data.offices?.length ? data.offices : fallbackSiteContent.offices,
     pageIntros: {
       ...fallbackSiteContent.pageIntros,
       ...data.pageIntros,

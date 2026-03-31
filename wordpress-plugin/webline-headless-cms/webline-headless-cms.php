@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Webline Headless CMS
  * Description: Headless WordPress configuration for the Webline Next.js frontend.
- * Version: 1.4.0
+ * Version: 1.5.0
  * Author: Misha17-27
  */
 
@@ -20,9 +20,17 @@ const WEBLINE_PORTFOLIO_META_CATEGORY = '_webline_portfolio_category';
 const WEBLINE_PORTFOLIO_META_DATE = '_webline_portfolio_date';
 const WEBLINE_PORTFOLIO_META_IMAGE = '_webline_portfolio_image';
 const WEBLINE_PARTNER_META_ORDER = '_webline_partner_order';
+const WEBLINE_OFFICE_META_ORDER = '_webline_office_order';
+const WEBLINE_OFFICE_META_COUNTRY = '_webline_office_country';
+const WEBLINE_OFFICE_META_ADDRESS = '_webline_office_address';
+const WEBLINE_OFFICE_META_PHONE = '_webline_office_phone';
+const WEBLINE_OFFICE_META_EMAIL = '_webline_office_email';
+const WEBLINE_OFFICE_META_MAP_URL = '_webline_office_map_url';
+const WEBLINE_OFFICE_META_EMBED_URL = '_webline_office_embed_url';
 const WEBLINE_SEEDED_OPTION = 'webline_headless_seeded';
 const WEBLINE_COLLECTION_SEEDED_OPTION = 'webline_headless_collection_seeded';
 const WEBLINE_SERVICE_SYNC_OPTION = 'webline_headless_service_sync_v120';
+const WEBLINE_OFFICE_SYNC_OPTION = 'webline_headless_office_sync_v150';
 
 function webline_normalize_lang(?string $lang): string
 {
@@ -168,12 +176,22 @@ function webline_register_post_types(): void
         'menu_icon' => 'dashicons-groups',
         'supports' => ['title', 'thumbnail'],
     ]);
+
+    register_post_type('webline_office', [
+        'labels' => ['name' => 'Offices', 'singular_name' => 'Office'],
+        'public' => false,
+        'show_ui' => true,
+        'show_in_menu' => true,
+        'menu_position' => 30,
+        'menu_icon' => 'dashicons-location-alt',
+        'supports' => ['title'],
+    ]);
 }
 add_action('init', 'webline_register_post_types');
 
 function webline_disable_block_editor(bool $useBlockEditor, string $postType): bool
 {
-    return in_array($postType, ['page', 'webline_service', 'webline_faq', 'webline_portfolio', 'webline_partner'], true)
+    return in_array($postType, ['page', 'webline_service', 'webline_faq', 'webline_portfolio', 'webline_partner', 'webline_office'], true)
         ? false
         : $useBlockEditor;
 }
@@ -185,6 +203,7 @@ function webline_register_meta_boxes(): void
     add_meta_box('webline_faq_meta', 'FAQ Settings', 'webline_render_faq_meta', 'webline_faq', 'side');
     add_meta_box('webline_portfolio_meta', 'Portfolio Settings', 'webline_render_portfolio_meta', 'webline_portfolio', 'side');
     add_meta_box('webline_partner_meta', 'Partner Settings', 'webline_render_partner_meta', 'webline_partner', 'side');
+    add_meta_box('webline_office_meta', 'Office Settings', 'webline_render_office_meta', 'webline_office', 'normal');
 }
 add_action('add_meta_boxes', 'webline_register_meta_boxes');
 
@@ -259,6 +278,43 @@ function webline_render_partner_meta(WP_Post $post): void
     <?php
 }
 
+function webline_render_office_meta(WP_Post $post): void
+{
+    wp_nonce_field('webline_office_meta', 'webline_office_meta_nonce');
+    ?>
+    <div style="display:grid; gap:16px;">
+        <p>
+            <label for="webline_office_country"><strong>Country</strong></label><br>
+            <input type="text" class="widefat" id="webline_office_country" name="webline_office_country" value="<?php echo esc_attr((string) get_post_meta($post->ID, WEBLINE_OFFICE_META_COUNTRY, true)); ?>">
+        </p>
+        <p>
+            <label for="webline_office_address"><strong>Address</strong></label><br>
+            <textarea class="widefat" rows="3" id="webline_office_address" name="webline_office_address"><?php echo esc_textarea((string) get_post_meta($post->ID, WEBLINE_OFFICE_META_ADDRESS, true)); ?></textarea>
+        </p>
+        <p>
+            <label for="webline_office_phone"><strong>Phone</strong></label><br>
+            <input type="text" class="widefat" id="webline_office_phone" name="webline_office_phone" value="<?php echo esc_attr((string) get_post_meta($post->ID, WEBLINE_OFFICE_META_PHONE, true)); ?>">
+        </p>
+        <p>
+            <label for="webline_office_email"><strong>Email</strong></label><br>
+            <input type="email" class="widefat" id="webline_office_email" name="webline_office_email" value="<?php echo esc_attr((string) get_post_meta($post->ID, WEBLINE_OFFICE_META_EMAIL, true)); ?>">
+        </p>
+        <p>
+            <label for="webline_office_map_url"><strong>Map URL</strong></label><br>
+            <input type="url" class="widefat" id="webline_office_map_url" name="webline_office_map_url" value="<?php echo esc_attr((string) get_post_meta($post->ID, WEBLINE_OFFICE_META_MAP_URL, true)); ?>">
+        </p>
+        <p>
+            <label for="webline_office_embed_url"><strong>Map Embed URL</strong></label><br>
+            <input type="url" class="widefat" id="webline_office_embed_url" name="webline_office_embed_url" value="<?php echo esc_attr((string) get_post_meta($post->ID, WEBLINE_OFFICE_META_EMBED_URL, true)); ?>">
+        </p>
+        <p>
+            <label for="webline_office_order"><strong>Display order</strong></label><br>
+            <input type="number" class="widefat" id="webline_office_order" name="webline_office_order" value="<?php echo esc_attr((string) (get_post_meta($post->ID, WEBLINE_OFFICE_META_ORDER, true) ?: 0)); ?>">
+        </p>
+    </div>
+    <?php
+}
+
 function webline_save_meta_boxes(int $postId): void
 {
     if ((defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) || !current_user_can('edit_post', $postId)) {
@@ -286,6 +342,16 @@ function webline_save_meta_boxes(int $postId): void
 
     if ($postType === 'webline_partner' && isset($_POST['webline_partner_meta_nonce']) && wp_verify_nonce($_POST['webline_partner_meta_nonce'], 'webline_partner_meta')) {
         update_post_meta($postId, WEBLINE_PARTNER_META_ORDER, (int) ($_POST['webline_partner_order'] ?? 0));
+    }
+
+    if ($postType === 'webline_office' && isset($_POST['webline_office_meta_nonce']) && wp_verify_nonce($_POST['webline_office_meta_nonce'], 'webline_office_meta')) {
+        update_post_meta($postId, WEBLINE_OFFICE_META_ORDER, (int) ($_POST['webline_office_order'] ?? 0));
+        update_post_meta($postId, WEBLINE_OFFICE_META_COUNTRY, sanitize_text_field($_POST['webline_office_country'] ?? ''));
+        update_post_meta($postId, WEBLINE_OFFICE_META_ADDRESS, sanitize_textarea_field($_POST['webline_office_address'] ?? ''));
+        update_post_meta($postId, WEBLINE_OFFICE_META_PHONE, sanitize_text_field($_POST['webline_office_phone'] ?? ''));
+        update_post_meta($postId, WEBLINE_OFFICE_META_EMAIL, sanitize_email($_POST['webline_office_email'] ?? ''));
+        update_post_meta($postId, WEBLINE_OFFICE_META_MAP_URL, esc_url_raw($_POST['webline_office_map_url'] ?? ''));
+        update_post_meta($postId, WEBLINE_OFFICE_META_EMBED_URL, esc_url_raw($_POST['webline_office_embed_url'] ?? ''));
     }
 }
 add_action('save_post', 'webline_save_meta_boxes');
@@ -329,7 +395,7 @@ function webline_render_headless_page(): void
         <p>This plugin wires WordPress to the Next.js frontend at <code><?php echo esc_html(webline_frontend_url()); ?></code>.</p>
         <ul style="list-style:disc; padding-left:20px;">
             <li>Edit landing-page sections in <strong>Pages</strong>.</li>
-            <li>Edit repeating content in <strong>Services</strong>, <strong>FAQs</strong>, and <strong>Portfolio</strong>.</li>
+            <li>Edit repeating content in <strong>Services</strong>, <strong>FAQs</strong>, <strong>Portfolio</strong>, <strong>Partners</strong>, and <strong>Offices</strong>.</li>
             <li>REST settings endpoint: <code><?php echo esc_html(get_rest_url(null, 'runok/v1/settings')); ?></code></li>
         </ul>
     </div>
@@ -641,6 +707,52 @@ function webline_seed_post(string $postType, string $title, array $args = []): i
     ], $args));
 }
 
+function webline_default_offices(): array
+{
+    return [
+        [
+            'title' => 'Bakı',
+            'country' => 'Azərbaycan',
+            'address' => 'Heydər Əliyev prospekti 5',
+            'phone' => '+994 55 7284848',
+            'email' => 'info@thewebline.com',
+            'map_url' => 'https://maps.google.com/?q=Heydar+Aliyev+prospekti+5,+Baku',
+            'embed_url' => 'https://www.google.com/maps?q=Heydar+Aliyev+prospekti+5,+Baku&z=13&output=embed',
+            'order' => 1,
+        ],
+        [
+            'title' => 'Berlin',
+            'country' => 'Almaniya',
+            'address' => 'Naugarder Strasse 46, 10409',
+            'phone' => '+49 176 75552813',
+            'email' => 'info@thewebline.com',
+            'map_url' => 'https://maps.google.com/?q=Naugarder+Strasse+46,+10409+Berlin',
+            'embed_url' => 'https://www.google.com/maps?q=Naugarder+Strasse+46,+10409+Berlin&z=13&output=embed',
+            'order' => 2,
+        ],
+        [
+            'title' => 'Vyana',
+            'country' => 'Avstriya',
+            'address' => 'A-1110, Simmeringer Hauptstr.26IB',
+            'phone' => '+43 660 8600035',
+            'email' => 'info@thewebline.com',
+            'map_url' => 'https://maps.google.com/?q=Simmeringer+Hauptstrasse+26,+1110+Vienna',
+            'embed_url' => 'https://www.google.com/maps?q=Simmeringer+Hauptstrasse+26,+1110+Vienna&z=13&output=embed',
+            'order' => 3,
+        ],
+        [
+            'title' => 'Budapeşt',
+            'country' => 'Macarıstan',
+            'address' => '1051, Széchenyi István tér 7-8',
+            'phone' => '+36 30 336 6884',
+            'email' => 'info@thewebline.com',
+            'map_url' => 'https://maps.google.com/?q=Szechenyi+Istvan+ter+7-8,+1051+Budapest',
+            'embed_url' => 'https://www.google.com/maps?q=Szechenyi+Istvan+ter+7-8,+1051+Budapest&z=13&output=embed',
+            'order' => 4,
+        ],
+    ];
+}
+
 function webline_seed_collections(): void
 {
     if (get_option(WEBLINE_COLLECTION_SEEDED_OPTION) === '1') {
@@ -684,6 +796,17 @@ function webline_seed_collections(): void
         $partner = webline_seed_post('webline_partner', $title);
         update_post_meta($partner, WEBLINE_PARTNER_META_ORDER, $index + 1);
         update_post_meta($partner, WEBLINE_PORTFOLIO_META_IMAGE, $image);
+    }
+
+    foreach (webline_default_offices() as $officeDefinition) {
+        $office = webline_seed_post('webline_office', $officeDefinition['title']);
+        update_post_meta($office, WEBLINE_OFFICE_META_ORDER, $officeDefinition['order']);
+        update_post_meta($office, WEBLINE_OFFICE_META_COUNTRY, $officeDefinition['country']);
+        update_post_meta($office, WEBLINE_OFFICE_META_ADDRESS, $officeDefinition['address']);
+        update_post_meta($office, WEBLINE_OFFICE_META_PHONE, $officeDefinition['phone']);
+        update_post_meta($office, WEBLINE_OFFICE_META_EMAIL, $officeDefinition['email']);
+        update_post_meta($office, WEBLINE_OFFICE_META_MAP_URL, $officeDefinition['map_url']);
+        update_post_meta($office, WEBLINE_OFFICE_META_EMBED_URL, $officeDefinition['embed_url']);
     }
 
     update_option(WEBLINE_COLLECTION_SEEDED_OPTION, '1');
@@ -760,6 +883,79 @@ function webline_sync_services_v120(): void
     update_option(WEBLINE_SERVICE_SYNC_OPTION, '1');
 }
 add_action('admin_init', 'webline_sync_services_v120');
+
+function webline_sync_offices_v150(): void
+{
+    if (get_option(WEBLINE_OFFICE_SYNC_OPTION) === '1') {
+        return;
+    }
+
+    $defaults = webline_default_offices();
+    $existingPosts = get_posts([
+        'post_type' => 'webline_office',
+        'post_status' => ['publish', 'draft', 'pending', 'private'],
+        'posts_per_page' => -1,
+        'meta_key' => WEBLINE_OFFICE_META_ORDER,
+        'orderby' => ['meta_value_num' => 'ASC', 'date' => 'ASC'],
+    ]);
+
+    $usedIds = [];
+
+    foreach ($defaults as $officeDefinition) {
+        $matchedPost = null;
+
+        foreach ($existingPosts as $post) {
+            if ((int) get_post_meta($post->ID, WEBLINE_OFFICE_META_ORDER, true) === (int) $officeDefinition['order']) {
+                $matchedPost = $post;
+                break;
+            }
+        }
+
+        if (!$matchedPost instanceof WP_Post) {
+            $matchedPost = get_page_by_title($officeDefinition['title'], OBJECT, 'webline_office');
+        }
+
+        if ($matchedPost instanceof WP_Post) {
+            wp_update_post([
+                'ID' => $matchedPost->ID,
+                'post_title' => $officeDefinition['title'],
+                'post_status' => 'publish',
+            ]);
+            $officeId = (int) $matchedPost->ID;
+        } else {
+            $officeId = (int) wp_insert_post([
+                'post_type' => 'webline_office',
+                'post_status' => 'publish',
+                'post_title' => $officeDefinition['title'],
+            ]);
+        }
+
+        if ($officeId <= 0) {
+            continue;
+        }
+
+        $usedIds[] = $officeId;
+        update_post_meta($officeId, WEBLINE_OFFICE_META_ORDER, $officeDefinition['order']);
+        update_post_meta($officeId, WEBLINE_OFFICE_META_COUNTRY, $officeDefinition['country']);
+        update_post_meta($officeId, WEBLINE_OFFICE_META_ADDRESS, $officeDefinition['address']);
+        update_post_meta($officeId, WEBLINE_OFFICE_META_PHONE, $officeDefinition['phone']);
+        update_post_meta($officeId, WEBLINE_OFFICE_META_EMAIL, $officeDefinition['email']);
+        update_post_meta($officeId, WEBLINE_OFFICE_META_MAP_URL, $officeDefinition['map_url']);
+        update_post_meta($officeId, WEBLINE_OFFICE_META_EMBED_URL, $officeDefinition['embed_url']);
+    }
+
+    foreach ($existingPosts as $post) {
+        if (!in_array((int) $post->ID, $usedIds, true)) {
+            wp_update_post([
+                'ID' => $post->ID,
+                'post_status' => 'draft',
+            ]);
+        }
+    }
+
+    update_option(WEBLINE_OFFICE_SYNC_OPTION, '1');
+}
+add_action('admin_init', 'webline_sync_offices_v150');
 
 function webline_get_frontend_page_url(WP_Post $post): string
 {
@@ -881,6 +1077,31 @@ function webline_get_partner_data(?string $lang = null): array
     });
 }
 
+function webline_get_office_data(?string $lang = null): array
+{
+    return webline_with_lang($lang, static function () {
+        $posts = get_posts([
+            'post_type' => 'webline_office',
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'meta_key' => WEBLINE_OFFICE_META_ORDER,
+            'orderby' => ['meta_value_num' => 'ASC', 'date' => 'ASC'],
+        ]);
+
+        return array_map(static function (WP_Post $post) {
+            return [
+                'city' => $post->post_title,
+                'country' => (string) get_post_meta($post->ID, WEBLINE_OFFICE_META_COUNTRY, true),
+                'address' => (string) get_post_meta($post->ID, WEBLINE_OFFICE_META_ADDRESS, true),
+                'phone' => (string) get_post_meta($post->ID, WEBLINE_OFFICE_META_PHONE, true),
+                'email' => (string) get_post_meta($post->ID, WEBLINE_OFFICE_META_EMAIL, true),
+                'mapUrl' => (string) get_post_meta($post->ID, WEBLINE_OFFICE_META_MAP_URL, true),
+                'embedUrl' => (string) get_post_meta($post->ID, WEBLINE_OFFICE_META_EMBED_URL, true),
+            ];
+        }, $posts);
+    });
+}
+
 function webline_build_settings_payload(?string $lang = null): array
 {
     return webline_with_lang($lang, static function () {
@@ -930,6 +1151,7 @@ function webline_build_settings_payload(?string $lang = null): array
                 'responseText' => webline_get_field_value('contact', 'response_text', ''),
                 'mapHeading' => webline_get_field_value('contact', 'map_heading', 'Find the studio in Baku.'),
             ],
+            'offices' => webline_get_office_data($lang),
             'pageIntros' => [
                 'services' => ['eyebrow' => webline_get_field_value('services', 'intro_eyebrow', 'Services'), 'title' => webline_get_field_value('services', 'intro_title', ''), 'description' => webline_get_field_value('services', 'intro_description', '')],
                 'process' => ['eyebrow' => webline_get_field_value('process', 'intro_eyebrow', 'Process'), 'title' => webline_get_field_value('process', 'intro_title', ''), 'description' => webline_get_field_value('process', 'intro_description', '')],
@@ -1009,7 +1231,7 @@ function webline_trigger_revalidate(int $postId, WP_Post $post): void
         return;
     }
 
-    if (!in_array($post->post_type, ['page', 'webline_service', 'webline_faq', 'webline_portfolio', 'webline_partner', 'post'], true)) {
+    if (!in_array($post->post_type, ['page', 'webline_service', 'webline_faq', 'webline_portfolio', 'webline_partner', 'webline_office', 'post'], true)) {
         return;
     }
 
@@ -1021,7 +1243,7 @@ function webline_trigger_delete_revalidate(int $postId): void
 {
     $post = get_post($postId);
 
-    if ($post instanceof WP_Post && in_array($post->post_type, ['page', 'webline_service', 'webline_faq', 'webline_portfolio', 'webline_partner', 'post'], true)) {
+    if ($post instanceof WP_Post && in_array($post->post_type, ['page', 'webline_service', 'webline_faq', 'webline_portfolio', 'webline_partner', 'webline_office', 'post'], true)) {
         webline_send_revalidate(webline_revalidate_paths_for_post($post));
     }
 }

@@ -32,6 +32,16 @@ export type PartnerItem = {
   image: string;
 };
 
+export type ContactOffice = {
+  city: string;
+  country: string;
+  address: string;
+  phone: string;
+  email: string;
+  mapUrl: string;
+  embedUrl: string;
+};
+
 export type PageIntroContent = {
   eyebrow: string;
   title: string;
@@ -75,6 +85,7 @@ export type SiteContent = {
     responseText: string;
     mapHeading: string;
   };
+  offices: ContactOffice[];
   pageIntros: Record<string, PageIntroContent>;
 };
 
@@ -282,6 +293,48 @@ export const fallbackSiteContent: SiteContent = {
     responseText: "Most inquiries get a reply within one business day.",
     mapHeading: "Find the studio in Baku.",
   },
+  offices: [
+    {
+      city: "Bakı",
+      country: "Azərbaycan",
+      address: "Heydər Əliyev prospekti 5",
+      phone: "+994 55 728 48 48",
+      email: "info@thewebline.com",
+      mapUrl: "https://maps.google.com/?q=Heydar+Aliyev+prospekti+5,+Baku",
+      embedUrl:
+        "https://www.google.com/maps?q=Heydar+Aliyev+prospekti+5,+Baku&z=13&output=embed",
+    },
+    {
+      city: "Berlin",
+      country: "Almaniya",
+      address: "Naugarder Strasse 46, 10409",
+      phone: "+49 176 75552813",
+      email: "info@thewebline.com",
+      mapUrl: "https://maps.google.com/?q=Naugarder+Strasse+46,+10409+Berlin",
+      embedUrl:
+        "https://www.google.com/maps?q=Naugarder+Strasse+46,+10409+Berlin&z=13&output=embed",
+    },
+    {
+      city: "Vyana",
+      country: "Avstriya",
+      address: "A-1110, Simmeringer Hauptstr.26IB",
+      phone: "+43 660 8600035",
+      email: "info@thewebline.com",
+      mapUrl: "https://maps.google.com/?q=Simmeringer+Hauptstrasse+26,+1110+Vienna",
+      embedUrl:
+        "https://www.google.com/maps?q=Simmeringer+Hauptstrasse+26,+1110+Vienna&z=13&output=embed",
+    },
+    {
+      city: "Budapeşt",
+      country: "Macarıstan",
+      address: "1051, Széchenyi István tér 7-8",
+      phone: "+36 30 336 6884",
+      email: "info@thewebline.com",
+      mapUrl: "https://maps.google.com/?q=Szechenyi+Istvan+ter+7-8,+1051+Budapest",
+      embedUrl:
+        "https://www.google.com/maps?q=Szechenyi+Istvan+ter+7-8,+1051+Budapest&z=13&output=embed",
+    },
+  ],
   pageIntros: {
     services: {
       eyebrow: "Services",
