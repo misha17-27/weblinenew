@@ -12,19 +12,24 @@ import {
 } from "../lib/portfolio-data";
 import { localizeHref } from "../lib/locale";
 import { getCurrentLocale } from "../lib/request-locale";
-import { getPortfolioProjects, getSiteContent } from "../lib/wordpress";
+import {
+  getPortfolioCategoriesFromCms,
+  getPortfolioProjects,
+  getSiteContent,
+} from "../lib/wordpress";
 
 export default async function PortfolioPage() {
   const locale = await getCurrentLocale();
-  const [siteContent, cmsProjects] = await Promise.all([
+  const [siteContent, cmsProjects, cmsCategories] = await Promise.all([
     getSiteContent(locale),
     getPortfolioProjects(locale),
+    getPortfolioCategoriesFromCms(locale),
   ]);
   const pageCopy = getPortfolioPageCopy(locale);
   const portfolioProjects = cmsProjects.length ? cmsProjects : fallbackPortfolioProjects;
   const categories = getPortfolioCategories(
     locale,
-    siteContent.portfolioCategories,
+    cmsCategories.length ? cmsCategories : siteContent.portfolioCategories,
     portfolioProjects
   );
 

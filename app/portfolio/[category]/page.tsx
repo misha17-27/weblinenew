@@ -11,20 +11,14 @@ import {
   getPortfolioCategories,
   getPortfolioCategory,
   getPortfolioPageCopy,
-  portfolioCategorySlugs,
-  type PortfolioCategorySlug,
 } from "../../lib/portfolio-data";
 import { localizeHref } from "../../lib/locale";
 import { getCurrentLocale } from "../../lib/request-locale";
-import { getPortfolioProjects, getSiteContent } from "../../lib/wordpress";
-
-function isPortfolioCategory(value: string): value is PortfolioCategorySlug {
-  return portfolioCategorySlugs.includes(value as PortfolioCategorySlug);
-}
-
-export function generateStaticParams() {
-  return portfolioCategorySlugs.map((category) => ({ category }));
-}
+import {
+  getPortfolioCategoriesFromCms,
+  getPortfolioProjects,
+  getSiteContent,
+} from "../../lib/wordpress";
 
 export default async function PortfolioCategoryPage({
   params,
@@ -32,26 +26,30 @@ export default async function PortfolioCategoryPage({
   params: Promise<{ category: string }>;
 }) {
   const { category } = await params;
-
-  if (!isPortfolioCategory(category)) {
-    notFound();
-  }
-
   const locale = await getCurrentLocale();
-  const [siteContent, cmsProjects] = await Promise.all([
+  const [siteContent, cmsProjects, cmsCategories] = await Promise.all([
     getSiteContent(locale),
     getPortfolioProjects(locale),
+    getPortfolioCategoriesFromCms(locale),
   ]);
   const pageCopy = getPortfolioPageCopy(locale);
   const portfolioProjects = cmsProjects.length ? cmsProjects : fallbackPortfolioProjects;
+  const categorySource =
+    cmsCategories.length ? cmsCategories : siteContent.portfolioCategories;
+  const categoryExists = categorySource.some((item) => item.slug === category);
+
+  if (!categoryExists) {
+    notFound();
+  }
+
   const categoryCopy = getPortfolioCategory(
     locale,
     category,
-    siteContent.portfolioCategories
+    categorySource
   );
   const categories = getPortfolioCategories(
     locale,
-    siteContent.portfolioCategories,
+    categorySource,
     portfolioProjects
   );
   const projects = portfolioProjects.filter(

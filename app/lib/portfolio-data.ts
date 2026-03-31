@@ -4,14 +4,7 @@ import {
   type PortfolioCategoryContent,
 } from "./site-data";
 
-export const portfolioCategorySlugs = [
-  "saytlar",
-  "dizaynlar",
-  "sosial-media",
-  "video-reels",
-] as const;
-
-export type PortfolioCategorySlug = (typeof portfolioCategorySlugs)[number];
+export type PortfolioCategorySlug = string;
 
 export type PortfolioCategoryCard = {
   slug: PortfolioCategorySlug;
@@ -44,7 +37,7 @@ type PortfolioDictionary = {
   emptyDescription: string;
   projectCountLabel: string;
   categories: Record<
-    PortfolioCategorySlug,
+    string,
     {
       title: string;
       description: string;
@@ -410,15 +403,18 @@ function getCategoryContent(
   const source =
     categories?.length ? categories : fallbackSiteContent.portfolioCategories;
 
-  return portfolioCategorySlugs.map((slug) => {
-    const fallbackCategory = dictionary.categories[slug];
-    const matchedCategory = source.find((item) => item.slug === slug);
+  return source.map((item) => {
+    const fallbackCategory = dictionary.categories[item.slug];
 
     return {
-      slug,
-      title: matchedCategory?.title || fallbackCategory.title,
-      description: matchedCategory?.description || fallbackCategory.description,
-      shortLabel: matchedCategory?.shortLabel || fallbackCategory.shortLabel,
+      slug: item.slug,
+      title: item.title || fallbackCategory?.title || item.slug,
+      description:
+        item.description || fallbackCategory?.description || "",
+      shortLabel:
+        item.shortLabel ||
+        fallbackCategory?.shortLabel ||
+        (fallbackCategory?.title ?? item.title ?? item.slug),
     };
   });
 }
@@ -439,19 +435,31 @@ export function getPortfolioCategories(
     {}
   );
 
-  return portfolioCategorySlugs.map((slug) => {
+  return categoryContent.map((category, index) => {
     const previewProject =
-      projects.find((project) => project.category === slug) ?? projects[0];
-    const category = categoryContent.find((item) => item.slug === slug);
+      projects.find((project) => project.category === category.slug) ?? projects[index] ?? projects[0];
+    const fallbackCategory = dictionary.categories[category.slug];
+    const count = projectCountByCategory[category.slug] ?? 0;
 
     return {
-      slug,
-      title: category?.title || dictionary.categories[slug].title,
-      description: category?.description || dictionary.categories[slug].description,
-      shortLabel: `${projectCountByCategory[slug] ?? 0} ${dictionary.projectCountLabel}`,
-      image: previewProject.image,
-      alt: previewProject.alt,
-      featuredTitle: previewProject.title,
+      slug: category.slug,
+      title: category.title || fallbackCategory?.title || category.slug,
+      description:
+        category.description || fallbackCategory?.description || "",
+      shortLabel: `${count} ${dictionary.projectCountLabel}`,
+      image:
+        previewProject?.image ||
+        fallbackPortfolioProjects[0]?.image ||
+        "https://webline.az/wp-content/uploads/2024/02/service-01.jpg",
+      alt:
+        previewProject?.alt ||
+        fallbackPortfolioProjects[0]?.alt ||
+        "Portfolio category preview",
+      featuredTitle:
+        previewProject?.title ||
+        category.shortLabel ||
+        fallbackCategory?.shortLabel ||
+        category.title,
     };
   });
 }
@@ -472,19 +480,22 @@ export function getPortfolioCategory(
   categories?: PortfolioCategoryContent[]
 ) {
   const dictionary = portfolioContent[locale] ?? portfolioContent.az;
-  const category =
-    getCategoryContent(locale, categories).find((item) => item.slug === slug) ?? {
-      slug,
-      title: dictionary.categories[slug].title,
-      description: dictionary.categories[slug].description,
-    };
+  const fallbackCategory = dictionary.categories[slug];
+  const category = getCategoryContent(locale, categories).find(
+    (item) => item.slug === slug
+  ) ?? {
+    slug,
+    title: fallbackCategory?.title ?? slug,
+    description: fallbackCategory?.description ?? "",
+    shortLabel: fallbackCategory?.shortLabel ?? slug,
+  };
 
   return {
     slug,
     eyebrow: dictionary.eyebrow,
     title: category.title,
     description: category.description,
-    shortLabel: category.shortLabel,
+    shortLabel: category.shortLabel || fallbackCategory?.shortLabel || category.title,
   };
 }
 

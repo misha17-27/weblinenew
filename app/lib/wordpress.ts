@@ -3,6 +3,7 @@ import {
   fallbackSiteContent,
   type InsightItem,
   type PartnerItem,
+  type PortfolioCategoryContent,
   type SiteContent,
 } from "./site-data";
 import type { LocaleCode } from "./locale";
@@ -38,6 +39,14 @@ type CmsPortfolioItem = {
   description: string;
   image: string;
   alt: string;
+};
+
+type CmsPortfolioCategory = {
+  slug?: string;
+  title?: string;
+  description?: string;
+  shortLabel?: string;
+  count?: number;
 };
 
 const apiBase =
@@ -201,6 +210,30 @@ export async function getPortfolioProjects(
       description: item.description,
       image: item.image,
       alt: item.alt || item.title,
+    }));
+}
+
+export async function getPortfolioCategoriesFromCms(
+  locale?: LocaleCode
+): Promise<PortfolioCategoryContent[]> {
+  const categories = await safeFetch<CmsPortfolioCategory[]>(
+    "/runok/v1/portfolio-categories",
+    locale
+  );
+
+  if (!categories?.length) {
+    return [];
+  }
+
+  return categories
+    .filter((item) => item.slug && item.title)
+    .map((item) => ({
+      slug: item.slug as string,
+      title: item.title as string,
+      description: item.description || "",
+      shortLabel:
+        item.shortLabel ||
+        `${item.count ?? 0} ${locale === "en" ? "projects" : locale === "tr" ? "proje" : locale === "de" ? "projekte" : locale === "ru" ? "проектов" : "layihə"}`,
     }));
 }
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Webline Headless CMS
  * Description: Headless WordPress configuration for the Webline Next.js frontend.
- * Version: 1.6.0
+ * Version: 1.7.0
  * Author: Misha17-27
  */
 
@@ -20,6 +20,7 @@ const WEBLINE_PORTFOLIO_META_CATEGORY = '_webline_portfolio_category';
 const WEBLINE_PORTFOLIO_META_CATEGORY_SLUG = '_webline_portfolio_category_slug';
 const WEBLINE_PORTFOLIO_META_DATE = '_webline_portfolio_date';
 const WEBLINE_PORTFOLIO_META_IMAGE = '_webline_portfolio_image';
+const WEBLINE_PORTFOLIO_TAXONOMY = 'webline_portfolio_category';
 const WEBLINE_PARTNER_META_ORDER = '_webline_partner_order';
 const WEBLINE_OFFICE_META_ORDER = '_webline_office_order';
 const WEBLINE_OFFICE_META_COUNTRY = '_webline_office_country';
@@ -33,6 +34,7 @@ const WEBLINE_COLLECTION_SEEDED_OPTION = 'webline_headless_collection_seeded';
 const WEBLINE_SERVICE_SYNC_OPTION = 'webline_headless_service_sync_v120';
 const WEBLINE_OFFICE_SYNC_OPTION = 'webline_headless_office_sync_v150';
 const WEBLINE_PORTFOLIO_SYNC_OPTION = 'webline_headless_portfolio_sync_v160';
+const WEBLINE_PORTFOLIO_TAXONOMY_SYNC_OPTION = 'webline_headless_portfolio_taxonomy_sync_v170';
 
 function webline_normalize_lang(?string $lang): string
 {
@@ -188,6 +190,19 @@ function webline_register_post_types(): void
         'menu_icon' => 'dashicons-location-alt',
         'supports' => ['title'],
     ]);
+
+    register_taxonomy(WEBLINE_PORTFOLIO_TAXONOMY, ['webline_portfolio'], [
+        'labels' => [
+            'name' => 'Portfolio Categories',
+            'singular_name' => 'Portfolio Category',
+        ],
+        'public' => false,
+        'show_ui' => true,
+        'show_admin_column' => true,
+        'hierarchical' => true,
+        'rewrite' => false,
+        'query_var' => false,
+    ]);
 }
 add_action('init', 'webline_register_post_types');
 
@@ -249,18 +264,7 @@ function webline_render_faq_meta(WP_Post $post): void
 function webline_render_portfolio_meta(WP_Post $post): void
 {
     wp_nonce_field('webline_portfolio_meta', 'webline_portfolio_meta_nonce');
-    $categorySlug = (string) get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_CATEGORY_SLUG, true);
     ?>
-    <p>
-        <label for="webline_portfolio_category_slug"><strong>Category group</strong></label><br>
-        <select class="widefat" id="webline_portfolio_category_slug" name="webline_portfolio_category_slug">
-            <?php foreach (webline_portfolio_category_definitions() as $slug => $definition) : ?>
-                <option value="<?php echo esc_attr($slug); ?>" <?php selected($categorySlug ?: 'saytlar', $slug); ?>>
-                    <?php echo esc_html($definition['title']); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </p>
     <p>
         <label for="webline_portfolio_category"><strong>Badge label</strong></label><br>
         <input type="text" class="widefat" id="webline_portfolio_category" name="webline_portfolio_category" value="<?php echo esc_attr((string) get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_CATEGORY, true)); ?>">
@@ -348,7 +352,6 @@ function webline_save_meta_boxes(int $postId): void
     }
 
     if ($postType === 'webline_portfolio' && isset($_POST['webline_portfolio_meta_nonce']) && wp_verify_nonce($_POST['webline_portfolio_meta_nonce'], 'webline_portfolio_meta')) {
-        update_post_meta($postId, WEBLINE_PORTFOLIO_META_CATEGORY_SLUG, sanitize_key($_POST['webline_portfolio_category_slug'] ?? 'saytlar'));
         update_post_meta($postId, WEBLINE_PORTFOLIO_META_CATEGORY, sanitize_text_field($_POST['webline_portfolio_category'] ?? ''));
         update_post_meta($postId, WEBLINE_PORTFOLIO_META_DATE, sanitize_text_field($_POST['webline_portfolio_date'] ?? ''));
         update_post_meta($postId, WEBLINE_PORTFOLIO_META_IMAGE, esc_url_raw($_POST['webline_portfolio_image'] ?? ''));
@@ -468,6 +471,59 @@ function webline_portfolio_category_definitions(): array
     ];
 }
 
+function webline_get_portfolio_term(WP_Post $post): ?WP_Term
+{
+    $terms = wp_get_post_terms($post->ID, WEBLINE_PORTFOLIO_TAXONOMY, [
+        'number' => 1,
+        'orderby' => 'term_order',
+        'order' => 'ASC',
+    ]);
+
+    if (is_wp_error($terms) || empty($terms) || !($terms[0] instanceof WP_Term)) {
+        return null;
+    }
+
+    return $terms[0];
+}
+
+function webline_get_portfolio_category_data(?string $lang = null): array
+{
+    return webline_with_lang($lang, static function () {
+        $terms = get_terms([
+            'taxonomy' => WEBLINE_PORTFOLIO_TAXONOMY,
+            'hide_empty' => false,
+            'orderby' => 'term_order',
+            'order' => 'ASC',
+        ]);
+
+        if (is_wp_error($terms) || empty($terms)) {
+            $fallback = [];
+
+            foreach (webline_portfolio_category_definitions() as $slug => $definition) {
+                $fallback[] = [
+                    'slug' => $slug,
+                    'title' => $definition['title'],
+                    'description' => $definition['description'],
+                    'shortLabel' => $definition['title'],
+                    'count' => 0,
+                ];
+            }
+
+            return $fallback;
+        }
+
+        return array_values(array_map(static function ($term): array {
+            return [
+                'slug' => $term->slug,
+                'title' => $term->name,
+                'description' => (string) $term->description,
+                'shortLabel' => $term->name,
+                'count' => (int) $term->count,
+            ];
+        }, array_filter($terms, static fn($term) => $term instanceof WP_Term)));
+    });
+}
+
 function webline_register_acf_groups(): void
 {
     if (!function_exists('acf_add_local_field_group')) {
@@ -529,16 +585,7 @@ function webline_register_acf_groups(): void
     acf_add_local_field_group([
         'key' => 'group_webline_portfolio',
         'title' => 'Webline Portfolio Content',
-        'fields' => array_merge(webline_intro_fields('portfolio'), [
-            ['key' => 'field_portfolio_category_saytlar_title', 'label' => 'Saytlar Title', 'name' => 'category_saytlar_title', 'type' => 'text'],
-            ['key' => 'field_portfolio_category_saytlar_description', 'label' => 'Saytlar Description', 'name' => 'category_saytlar_description', 'type' => 'text'],
-            ['key' => 'field_portfolio_category_dizaynlar_title', 'label' => 'Dizaynlar Title', 'name' => 'category_dizaynlar_title', 'type' => 'text'],
-            ['key' => 'field_portfolio_category_dizaynlar_description', 'label' => 'Dizaynlar Description', 'name' => 'category_dizaynlar_description', 'type' => 'text'],
-            ['key' => 'field_portfolio_category_sosial_media_title', 'label' => 'Sosial media Title', 'name' => 'category_sosial_media_title', 'type' => 'text'],
-            ['key' => 'field_portfolio_category_sosial_media_description', 'label' => 'Sosial media Description', 'name' => 'category_sosial_media_description', 'type' => 'text'],
-            ['key' => 'field_portfolio_category_video_reels_title', 'label' => 'Video reels Title', 'name' => 'category_video_reels_title', 'type' => 'text'],
-            ['key' => 'field_portfolio_category_video_reels_description', 'label' => 'Video reels Description', 'name' => 'category_video_reels_description', 'type' => 'text'],
-        ]),
+        'fields' => webline_intro_fields('portfolio'),
         'location' => webline_page_location('portfolio'),
     ]);
 
@@ -1024,8 +1071,17 @@ function webline_infer_portfolio_category_slug(string $title, string $badge, int
 
 function webline_sync_portfolio_v160(): void
 {
-    if (get_option(WEBLINE_PORTFOLIO_SYNC_OPTION) === '1') {
+    if (get_option(WEBLINE_PORTFOLIO_TAXONOMY_SYNC_OPTION) === '1') {
         return;
+    }
+
+    foreach (webline_portfolio_category_definitions() as $slug => $definition) {
+        if (!term_exists($slug, WEBLINE_PORTFOLIO_TAXONOMY)) {
+            wp_insert_term($definition['title'], WEBLINE_PORTFOLIO_TAXONOMY, [
+                'slug' => $slug,
+                'description' => $definition['description'],
+            ]);
+        }
     }
 
     $posts = get_posts([
@@ -1037,20 +1093,21 @@ function webline_sync_portfolio_v160(): void
 
     foreach ($posts as $index => $post) {
         $existingSlug = (string) get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_CATEGORY_SLUG, true);
-
-        if ($existingSlug !== '') {
-            continue;
-        }
-
         $badge = (string) get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_CATEGORY, true);
-        update_post_meta(
-            $post->ID,
-            WEBLINE_PORTFOLIO_META_CATEGORY_SLUG,
-            webline_infer_portfolio_category_slug($post->post_title, $badge, (int) $index)
-        );
+        $resolvedSlug = $existingSlug !== ''
+            ? $existingSlug
+            : webline_infer_portfolio_category_slug($post->post_title, $badge, (int) $index);
+
+        update_post_meta($post->ID, WEBLINE_PORTFOLIO_META_CATEGORY_SLUG, $resolvedSlug);
+
+        $term = get_term_by('slug', $resolvedSlug, WEBLINE_PORTFOLIO_TAXONOMY);
+        if ($term instanceof WP_Term) {
+            wp_set_post_terms($post->ID, [(int) $term->term_id], WEBLINE_PORTFOLIO_TAXONOMY, false);
+        }
     }
 
     update_option(WEBLINE_PORTFOLIO_SYNC_OPTION, '1');
+    update_option(WEBLINE_PORTFOLIO_TAXONOMY_SYNC_OPTION, '1');
 }
 add_action('admin_init', 'webline_sync_portfolio_v160');
 
@@ -1133,21 +1190,23 @@ function webline_get_portfolio_data(?string $lang = null): array
         $posts = get_posts([
             'post_type' => 'webline_portfolio',
             'post_status' => 'publish',
-            'posts_per_page' => 6,
+            'posts_per_page' => -1,
             'orderby' => ['date' => 'DESC'],
         ]);
 
         return array_map(static function (WP_Post $post) {
             $image = get_the_post_thumbnail_url($post, 'large') ?: get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_IMAGE, true);
-            $categorySlug = (string) get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_CATEGORY_SLUG, true);
-            $categorySlug = $categorySlug ?: 'saytlar';
+            $term = webline_get_portfolio_term($post);
+            $categorySlug = $term instanceof WP_Term
+                ? $term->slug
+                : ((string) get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_CATEGORY_SLUG, true) ?: 'saytlar');
             $badge = (string) get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_CATEGORY, true);
 
             return [
                 'slug' => $post->post_name ?: 'portfolio-' . $post->ID,
-                'category' => $badge ?: 'Portfolio',
+                'category' => $term instanceof WP_Term ? $term->name : ($badge ?: 'Portfolio'),
                 'categorySlug' => $categorySlug,
-                'badge' => $badge ?: 'Portfolio',
+                'badge' => $badge ?: ($term instanceof WP_Term ? $term->name : 'Portfolio'),
                 'date' => get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_DATE, true) ?: mysql2date('F j, Y', $post->post_date),
                 'title' => $post->post_title,
                 'description' => $post->post_excerpt ?: wp_strip_all_tags($post->post_content),
@@ -1202,24 +1261,6 @@ function webline_get_office_data(?string $lang = null): array
                 'embedUrl' => (string) get_post_meta($post->ID, WEBLINE_OFFICE_META_EMBED_URL, true),
             ];
         }, $posts);
-    });
-}
-
-function webline_get_portfolio_category_data(?string $lang = null): array
-{
-    return webline_with_lang($lang, static function () {
-        $categories = [];
-
-        foreach (webline_portfolio_category_definitions() as $slug => $definition) {
-            $fieldKey = str_replace('-', '_', $slug);
-            $categories[] = [
-                'slug' => $slug,
-                'title' => webline_get_field_value('portfolio', 'category_' . $fieldKey . '_title', $definition['title']),
-                'description' => webline_get_field_value('portfolio', 'category_' . $fieldKey . '_description', $definition['description']),
-            ];
-        }
-
-        return $categories;
     });
 }
 
@@ -1304,6 +1345,14 @@ function webline_register_rest_routes(): void
         'permission_callback' => '__return_true',
     ]);
 
+    register_rest_route('runok/v1', '/portfolio-categories', [
+        'methods' => WP_REST_Server::READABLE,
+        'callback' => static fn(WP_REST_Request $request) => rest_ensure_response(
+            webline_get_portfolio_category_data($request->get_param('lang'))
+        ),
+        'permission_callback' => '__return_true',
+    ]);
+
     register_rest_route('runok/v1', '/partners', [
         'methods' => WP_REST_Server::READABLE,
         'callback' => static fn(WP_REST_Request $request) => rest_ensure_response(
@@ -1322,7 +1371,10 @@ function webline_revalidate_paths_for_post(WP_Post $post): array
     }
 
     if ($post->post_type === 'webline_portfolio') {
-        $categorySlug = (string) get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_CATEGORY_SLUG, true);
+        $term = webline_get_portfolio_term($post);
+        $categorySlug = $term instanceof WP_Term
+            ? $term->slug
+            : (string) get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_CATEGORY_SLUG, true);
         $paths = ['/', '/portfolio'];
 
         if ($categorySlug !== '') {
@@ -1381,6 +1433,40 @@ function webline_trigger_delete_revalidate(int $postId): void
     }
 }
 add_action('deleted_post', 'webline_trigger_delete_revalidate');
+
+function webline_trigger_portfolio_term_revalidate(int $termId, int $ttId = 0, string $taxonomy = ''): void
+{
+    if ($taxonomy !== WEBLINE_PORTFOLIO_TAXONOMY) {
+        return;
+    }
+
+    $term = get_term($termId, $taxonomy);
+    $paths = ['/', '/portfolio'];
+
+    if ($term instanceof WP_Term) {
+        $paths[] = '/portfolio/' . ltrim($term->slug, '/');
+    }
+
+    webline_send_revalidate($paths);
+}
+add_action('created_' . WEBLINE_PORTFOLIO_TAXONOMY, 'webline_trigger_portfolio_term_revalidate', 10, 3);
+add_action('edited_' . WEBLINE_PORTFOLIO_TAXONOMY, 'webline_trigger_portfolio_term_revalidate', 10, 3);
+
+function webline_trigger_portfolio_term_delete_revalidate(int $termId, int $ttId = 0, string $taxonomy = '', $deletedTerm = null): void
+{
+    if ($taxonomy !== WEBLINE_PORTFOLIO_TAXONOMY) {
+        return;
+    }
+
+    $paths = ['/', '/portfolio'];
+
+    if ($deletedTerm instanceof WP_Term) {
+        $paths[] = '/portfolio/' . ltrim($deletedTerm->slug, '/');
+    }
+
+    webline_send_revalidate($paths);
+}
+add_action('delete_' . WEBLINE_PORTFOLIO_TAXONOMY, 'webline_trigger_portfolio_term_delete_revalidate', 10, 4);
 
 function webline_activate_plugin(): void
 {
