@@ -5,7 +5,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
-import { defaultLocale, isLocale, localeCookieName, locales } from "../lib/locale";
+import {
+  defaultLocale,
+  isLocale,
+  localeCookieName,
+  locales,
+  localizeHref,
+} from "../lib/locale";
 import { WeblineLogo } from "./webline-logo";
 
 type ThemeMode = "light" | "dark";
@@ -149,13 +155,20 @@ export function SiteHeader() {
     document.cookie = `${localeCookieName}=${nextLocale}; path=/; max-age=31536000; samesite=lax`;
     setLocaleOpen(false);
     setMenuOpen(false);
+
+    if (typeof window !== "undefined") {
+      const targetHref = `${localizeHref(window.location.pathname, nextLocale as typeof resolvedLocale)}${window.location.search}${window.location.hash}`;
+      router.push(targetHref);
+      return;
+    }
+
     router.refresh();
   };
 
   return (
     <header className="topbar">
       <nav className="shell nav" aria-label="Primary">
-        <Link className="brand" href="/">
+        <Link className="brand" href={localizeHref("/", resolvedLocale)}>
           <WeblineLogo className="brand-logo" />
         </Link>
 
@@ -164,7 +177,7 @@ export function SiteHeader() {
             <Link
               className={pathname === item.href ? "is-active" : undefined}
               key={item.href}
-              href={item.href}
+              href={localizeHref(item.href, resolvedLocale)}
             >
               {item.label}
             </Link>
@@ -255,7 +268,7 @@ export function SiteHeader() {
             {navItems.map((item, index) => (
               <Link
                 className={pathname === item.href ? "is-active" : undefined}
-                href={item.href}
+                href={localizeHref(item.href, resolvedLocale)}
                 key={item.href}
                 style={{ ["--item-index" as string]: index } as CSSProperties}
               >
@@ -306,7 +319,10 @@ export function SiteHeader() {
             <div className="nav-panel__meta">{t("header.meta")}</div>
           </div>
 
-          <Link className="button button-primary nav-panel__cta" href="/contact">
+          <Link
+            className="button button-primary nav-panel__cta"
+            href={localizeHref("/contact", resolvedLocale)}
+          >
             {t("header.cta")}
           </Link>
         </div>

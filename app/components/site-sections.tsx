@@ -9,7 +9,7 @@ import {
   type SiteContent,
 } from "../lib/site-data";
 import { getMessages } from "../lib/messages";
-import type { LocaleCode } from "../lib/locale";
+import { localizeHref, type LocaleCode } from "../lib/locale";
 import { WeblineLogo } from "./webline-logo";
 
 export { SiteHeader } from "./site-header";
@@ -46,7 +46,7 @@ export function SiteFooter({
     <footer className="footer">
       <div className="shell footer-grid">
         <div>
-          <Link className="brand footer-brand" href="/">
+          <Link className="brand footer-brand" href={localizeHref("/", locale)}>
             <WeblineLogo className="brand-logo brand-logo--footer" footer />
           </Link>
           <p>{description ?? t.footer.description}</p>
@@ -60,7 +60,7 @@ export function SiteFooter({
             <a href="https://linkedin.com" aria-label="LinkedIn">
               in
             </a>
-            <Link href="/" aria-label="Website">
+            <Link href={localizeHref("/", locale)} aria-label="Website">
               x
             </Link>
           </div>
@@ -68,7 +68,7 @@ export function SiteFooter({
         <div className="footer-links">
           <h4>{t.footer.servicesTitle}</h4>
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.href} href={localizeHref(item.href, locale)}>
               {item.label}
             </Link>
           ))}
@@ -121,10 +121,10 @@ export function HeroSection({
         </h1>
         <p>{content.description}</p>
         <div className="hero-actions">
-          <Link className="button button-primary" href="/contact">
+          <Link className="button button-primary" href={localizeHref("/contact", locale)}>
             {t.home.startProject}
           </Link>
-          <Link className="button button-ghost" href="/portfolio">
+          <Link className="button button-ghost" href={localizeHref("/portfolio", locale)}>
             {t.home.ourWorks} <span className="arrow">-&gt;</span>
           </Link>
         </div>
@@ -225,7 +225,7 @@ export function AboutSection({
               <li key={bullet}>{bullet}</li>
             ))}
           </ul>
-          <Link className="button button-outline" href="/services">
+          <Link className="button button-outline" href={localizeHref("/services", locale)}>
             {t.cta.reviewServices}
           </Link>
         </div>
@@ -310,7 +310,7 @@ export function InsightsSection({
       <div className="shell">
         <div className="section-heading split">
           <h2>{heading}</h2>
-          <Link className="button button-link" href="/portfolio">
+          <Link className="button button-link" href={localizeHref("/portfolio", locale)}>
             {t.portfolio.viewAllPosts} <span className="arrow">-&gt;</span>
           </Link>
         </div>
@@ -358,10 +358,10 @@ export function CtaStrip({
             <p>{description}</p>
           </div>
           <div className="button-row">
-            <Link className="button button-primary" href="/services">
+            <Link className="button button-primary" href={localizeHref("/services", locale)}>
               {t.cta.reviewServices}
             </Link>
-            <Link className="button button-outline" href="/contact">
+            <Link className="button button-outline" href={localizeHref("/contact", locale)}>
               {t.cta.contactUs}
             </Link>
           </div>

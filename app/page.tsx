@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SiteFooter, SiteHeader } from "./components/site-sections";
 import { aboutImageOne, aboutImageTwo, heroImage } from "./lib/site-data";
 import { getMessages } from "./lib/messages";
+import { localizeHref } from "./lib/locale";
 import { getCurrentLocale } from "./lib/request-locale";
 import { getInsights, getSiteContent } from "./lib/wordpress";
 
@@ -39,10 +40,10 @@ export default async function Home() {
           </h1>
           <p>{content.homeHero.description}</p>
           <div className="hero-actions">
-            <Link className="button button-accent" href="/contact">
+            <Link className="button button-accent" href={localizeHref("/contact", locale)}>
               {t.home.startProject} →
             </Link>
-            <Link className="button button-outline" href="/portfolio">
+            <Link className="button button-outline" href={localizeHref("/portfolio", locale)}>
               {t.home.ourWorks}
             </Link>
           </div>
@@ -92,7 +93,7 @@ export default async function Home() {
               <span className="eyebrow">{content.pageIntros.portfolio.eyebrow}</span>
               <h2>{content.pageIntros.portfolio.title}</h2>
             </div>
-            <Link className="button button-outline" href="/portfolio">
+            <Link className="button button-outline" href={localizeHref("/portfolio", locale)}>
               {t.home.allProjects} →
             </Link>
           </div>
@@ -146,7 +147,7 @@ export default async function Home() {
       <section className="webline-cta shell">
         <h2>{content.contact.panelTitle}</h2>
         <p>{content.contact.panelDescription}</p>
-        <Link className="button button-accent" href="/contact">
+        <Link className="button button-accent" href={localizeHref("/contact", locale)}>
           {t.home.reserveConsultation} →
         </Link>
       </section>
