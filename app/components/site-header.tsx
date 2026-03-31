@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
@@ -84,7 +84,6 @@ function SunIcon() {
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const router = useRouter();
   const locale = useLocale();
   const t = useTranslations();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -158,11 +157,9 @@ export function SiteHeader() {
 
     if (typeof window !== "undefined") {
       const targetHref = `${localizeHref(window.location.pathname, nextLocale as typeof resolvedLocale)}${window.location.search}${window.location.hash}`;
-      router.push(targetHref);
+      window.location.assign(targetHref);
       return;
     }
-
-    router.refresh();
   };
 
   return (

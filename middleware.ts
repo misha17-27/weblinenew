@@ -52,9 +52,9 @@ export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(localeHeaderName, storedLocale);
 
-  if (storedLocale !== defaultLocale && pathname !== "/") {
+  if (storedLocale !== defaultLocale) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = `/${storedLocale}${pathname}`;
+    redirectUrl.pathname = pathname === "/" ? `/${storedLocale}` : `/${storedLocale}${pathname}`;
     redirectUrl.search = search;
     return NextResponse.redirect(redirectUrl);
   }
