@@ -6,15 +6,16 @@ import { aboutImageOne, aboutImageTwo, heroImage } from "./lib/site-data";
 import { getMessages } from "./lib/messages";
 import { localizeHref } from "./lib/locale";
 import { getCurrentLocale } from "./lib/request-locale";
-import { getInsights, getSiteContent } from "./lib/wordpress";
-
-const partnerLogos = ["SOCAR", "Azercell", "PASHA Bank", "Kapital Bank"];
+import { getInsights, getPartners, getSiteContent } from "./lib/wordpress";
 
 export default async function Home() {
   const locale = await getCurrentLocale();
   const t = getMessages(locale);
-  const content = await getSiteContent(locale);
-  const insights = await getInsights(locale);
+  const [content, insights, partners] = await Promise.all([
+    getSiteContent(locale),
+    getInsights(locale),
+    getPartners(locale),
+  ]);
 
   const mosaicColumns = [
     [
@@ -101,8 +102,15 @@ export default async function Home() {
           <span className="webline-partners__label">{t.home.trustedBy}</span>
           <div className="webline-partners__marquee" aria-label="Partner logos">
             <div className="webline-partners__track">
-              {[...partnerLogos, ...partnerLogos].map((partner, index) => (
-                <strong key={`${partner}-${index}`}>{partner}</strong>
+              {[...partners, ...partners].map((partner, index) => (
+                <div className="webline-partners__logo" key={`${partner.title}-${index}`}>
+                  <Image
+                    alt={partner.title}
+                    height={52}
+                    src={partner.image}
+                    width={180}
+                  />
+                </div>
               ))}
             </div>
           </div>

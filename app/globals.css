@@ -1460,8 +1460,8 @@ html[data-theme="dark"] .webline-partners {
   position: relative;
   flex: 1 1 auto;
   overflow: hidden;
-  mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.2) 6%, #000 14%, #000 86%, rgba(0, 0, 0, 0.2) 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.2) 6%, #000 14%, #000 86%, rgba(0, 0, 0, 0.2) 94%, transparent 100%);
 }
 
 .webline-partners__track {
@@ -1469,7 +1469,7 @@ html[data-theme="dark"] .webline-partners {
   align-items: center;
   gap: 3.5rem;
   width: max-content;
-  animation: partners-marquee-loop 28s linear infinite;
+  animation: partners-marquee-loop 34s linear infinite;
   will-change: transform;
 }
 
@@ -1477,14 +1477,29 @@ html[data-theme="dark"] .webline-partners {
   animation-play-state: paused;
 }
 
-.webline-partners__track strong {
+.webline-partners__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
-  color: rgba(22, 22, 31, 0.42);
-  font-weight: 700;
+  min-width: 9rem;
+  height: 3.2rem;
 }
 
-html[data-theme="dark"] .webline-partners__track strong {
-  color: rgba(243, 242, 239, 0.58);
+.webline-partners__logo img {
+  flex: 0 0 auto;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 2.2rem;
+  object-fit: contain;
+  opacity: 0.72;
+  filter: grayscale(1);
+}
+
+html[data-theme="dark"] .webline-partners__logo img {
+  opacity: 0.82;
+  filter: grayscale(1) brightness(0.9) invert(0.92);
 }
 
 @keyframes partners-marquee-loop {
@@ -2927,7 +2942,7 @@ html[data-theme="dark"] .office-map-link {
 
   .webline-partners__track {
     gap: 2rem;
-    animation-duration: 24s;
+    animation-duration: 26s;
   }
 
   .webline-stat-card {
