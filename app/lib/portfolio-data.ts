@@ -24,6 +24,10 @@ export type PortfolioProject = {
   description: string;
   image: string;
   alt: string;
+  gallery?: Array<{
+    src: string;
+    alt: string;
+  }>;
 };
 
 type PortfolioDictionary = {

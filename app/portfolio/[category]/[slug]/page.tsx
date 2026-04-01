@@ -69,8 +69,7 @@ export default async function PortfolioProjectPage({
   const detailParagraphs = buildProjectParagraphs(project.description);
   const galleryImages = [
     { src: project.image, alt: project.alt },
-    { src: project.image, alt: `${project.alt} detail 1` },
-    { src: project.image, alt: `${project.alt} detail 2` },
+    ...(project.gallery ?? []),
   ];
 
   return (
@@ -108,19 +107,21 @@ export default async function PortfolioProjectPage({
             />
           </div>
 
-          <div className="portfolio-project-gallery__thumbs">
-            {galleryImages.slice(1).map((image, index) => (
-              <div className="portfolio-project-gallery__thumb" key={`${image.alt}-${index}`}>
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  width={720}
-                  height={520}
-                  sizes="(max-width: 760px) 50vw, 33vw"
-                />
-              </div>
-            ))}
-          </div>
+          {galleryImages.length > 1 ? (
+            <div className="portfolio-project-gallery__thumbs">
+              {galleryImages.slice(1).map((image, index) => (
+                <div className="portfolio-project-gallery__thumb" key={`${image.alt}-${index}`}>
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    width={720}
+                    height={520}
+                    sizes="(max-width: 760px) 50vw, 33vw"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       </section>
 

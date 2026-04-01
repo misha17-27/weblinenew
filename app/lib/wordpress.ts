@@ -39,6 +39,10 @@ type CmsPortfolioItem = {
   description: string;
   image: string;
   alt: string;
+  gallery?: Array<{
+    src?: string;
+    alt?: string;
+  }>;
 };
 
 type CmsPortfolioCategory = {
@@ -210,6 +214,15 @@ export async function getPortfolioProjects(
       description: item.description,
       image: item.image,
       alt: item.alt || item.title,
+      gallery:
+        item.gallery
+          ?.filter((galleryItem) => galleryItem.src)
+          .map((galleryItem, galleryIndex) => ({
+            src: galleryItem.src as string,
+            alt:
+              galleryItem.alt ||
+              `${item.title} gallery ${galleryIndex + 1}`,
+          })) || [],
     }));
 }
 

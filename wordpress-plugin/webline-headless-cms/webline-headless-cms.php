@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Webline Headless CMS
  * Description: Headless WordPress configuration for the Webline Next.js frontend.
- * Version: 1.7.0
+ * Version: 1.8.0
  * Author: Misha17-27
  */
 
@@ -20,6 +20,7 @@ const WEBLINE_PORTFOLIO_META_CATEGORY = '_webline_portfolio_category';
 const WEBLINE_PORTFOLIO_META_CATEGORY_SLUG = '_webline_portfolio_category_slug';
 const WEBLINE_PORTFOLIO_META_DATE = '_webline_portfolio_date';
 const WEBLINE_PORTFOLIO_META_IMAGE = '_webline_portfolio_image';
+const WEBLINE_PORTFOLIO_META_GALLERY = '_webline_portfolio_gallery';
 const WEBLINE_PORTFOLIO_TAXONOMY = 'webline_portfolio_category';
 const WEBLINE_PARTNER_META_ORDER = '_webline_partner_order';
 const WEBLINE_OFFICE_META_ORDER = '_webline_office_order';
@@ -277,6 +278,11 @@ function webline_render_portfolio_meta(WP_Post $post): void
         <label for="webline_portfolio_image"><strong>External image URL</strong></label><br>
         <input type="url" class="widefat" id="webline_portfolio_image" name="webline_portfolio_image" value="<?php echo esc_attr((string) get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_IMAGE, true)); ?>">
     </p>
+    <p>
+        <label for="webline_portfolio_gallery"><strong>Gallery image URLs</strong></label><br>
+        <textarea class="widefat" rows="6" id="webline_portfolio_gallery" name="webline_portfolio_gallery" placeholder="One image URL per line"><?php echo esc_textarea((string) get_post_meta($post->ID, WEBLINE_PORTFOLIO_META_GALLERY, true)); ?></textarea>
+        <small>The featured image is used as the main image. Add extra gallery images here, one URL per line.</small>
+    </p>
     <?php
 }
 
@@ -355,6 +361,7 @@ function webline_save_meta_boxes(int $postId): void
         update_post_meta($postId, WEBLINE_PORTFOLIO_META_CATEGORY, sanitize_text_field($_POST['webline_portfolio_category'] ?? ''));
         update_post_meta($postId, WEBLINE_PORTFOLIO_META_DATE, sanitize_text_field($_POST['webline_portfolio_date'] ?? ''));
         update_post_meta($postId, WEBLINE_PORTFOLIO_META_IMAGE, esc_url_raw($_POST['webline_portfolio_image'] ?? ''));
+        update_post_meta($postId, WEBLINE_PORTFOLIO_META_GALLERY, sanitize_textarea_field($_POST['webline_portfolio_gallery'] ?? ''));
     }
 
     if ($postType === 'webline_partner' && isset($_POST['webline_partner_meta_nonce']) && wp_verify_nonce($_POST['webline_partner_meta_nonce'], 'webline_partner_meta')) {
@@ -1165,6 +1172,19 @@ function webline_get_services_data(): array
     }, $posts);
 }
 
+function webline_get_gallery_items(int $postId, string $title = ''): array
+{
+    $gallery = (string) get_post_meta($postId, WEBLINE_PORTFOLIO_META_GALLERY, true);
+    $urls = webline_parse_lines($gallery);
+
+    return array_values(array_map(static function (string $url, int $index) use ($title): array {
+        return [
+            'src' => esc_url_raw($url),
+            'alt' => trim($title) !== '' ? $title . ' gallery ' . ($index + 1) : 'Portfolio gallery ' . ($index + 1),
+        ];
+    }, $urls, array_keys($urls)));
+}
+
 function webline_get_faq_data(): array
 {
     $posts = get_posts([
@@ -1212,6 +1232,7 @@ function webline_get_portfolio_data(?string $lang = null): array
                 'description' => $post->post_excerpt ?: wp_strip_all_tags($post->post_content),
                 'image' => $image ?: '',
                 'alt' => get_post_meta(get_post_thumbnail_id($post->ID), '_wp_attachment_image_alt', true) ?: $post->post_title,
+                'gallery' => webline_get_gallery_items($post->ID, $post->post_title),
             ];
         }, $posts);
     });

@@ -19,6 +19,7 @@
     <custom-field action="translate">_webline_portfolio_category</custom-field>
     <custom-field action="translate">_webline_portfolio_date</custom-field>
     <custom-field action="copy">_webline_portfolio_image</custom-field>
+    <custom-field action="copy">_webline_portfolio_gallery</custom-field>
     <custom-field action="copy">_webline_partner_order</custom-field>
     <custom-field action="copy">_webline_office_order</custom-field>
     <custom-field action="translate">_webline_office_country</custom-field>
