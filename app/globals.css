@@ -1366,7 +1366,8 @@ html[data-theme="dark"] .webline-page {
 }
 
 .webline-mosaic__track {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 0.9rem;
   animation: mosaic-vertical-loop var(--mosaic-duration, 20s) linear infinite;
   will-change: transform;
@@ -1378,7 +1379,8 @@ html[data-theme="dark"] .webline-page {
 
 .mosaic-card {
   overflow: hidden;
-  min-height: 9rem;
+  flex: 0 0 auto;
+  height: 11rem;
   border-radius: 1.2rem;
   background: rgba(255, 255, 255, 0.55);
   box-shadow: 0 16px 44px rgba(22, 18, 8, 0.08);
@@ -1390,7 +1392,7 @@ html[data-theme="dark"] .mosaic-card {
 }
 
 .mosaic-card--tall {
-  grid-row: span 2;
+  height: 18rem;
 }
 
 .mosaic-card img {
@@ -2603,8 +2605,12 @@ html[data-theme="dark"] .office-map-link {
     animation: none;
   }
 
+  .mosaic-card {
+    height: 10rem;
+  }
+
   .mosaic-card--tall {
-    grid-row: span 1;
+    height: 13rem;
   }
 
   .webline-hero {
