@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { SiteFooter, SiteHeader } from "./components/site-sections";
 import { aboutImageOne, aboutImageTwo, heroImage } from "./lib/site-data";
 import { getMessages } from "./lib/messages";
@@ -15,15 +16,23 @@ export default async function Home() {
   const content = await getSiteContent(locale);
   const insights = await getInsights(locale);
 
-  const mosaicImages = [
-    { src: heroImage, alt: "Laptop interface", tall: true },
-    { src: aboutImageTwo, alt: "Interior", tall: true },
-    { src: insights[2]?.image ?? heroImage, alt: insights[2]?.alt ?? "Workspace", tall: true },
-    { src: insights[0]?.image ?? aboutImageOne, alt: insights[0]?.alt ?? "Team" },
-    { src: insights[1]?.image ?? aboutImageTwo, alt: insights[1]?.alt ?? "Charts" },
-    { src: aboutImageOne, alt: "Studio" },
-    { src: insights[2]?.image ?? heroImage, alt: "Display" },
-    { src: heroImage, alt: "Product" },
+  const mosaicColumns = [
+    [
+      { src: heroImage, alt: "Laptop interface", tall: true },
+      { src: insights[0]?.image ?? aboutImageOne, alt: insights[0]?.alt ?? "Team" },
+    ],
+    [
+      { src: aboutImageTwo, alt: "Interior", tall: true },
+      { src: insights[2]?.image ?? heroImage, alt: insights[2]?.alt ?? "Workspace" },
+    ],
+    [
+      { src: insights[2]?.image ?? heroImage, alt: "Display", tall: true },
+      { src: aboutImageOne, alt: "Studio" },
+    ],
+    [
+      { src: insights[1]?.image ?? aboutImageTwo, alt: insights[1]?.alt ?? "Charts" },
+      { src: heroImage, alt: "Product" },
+    ],
   ];
 
   return (
@@ -49,19 +58,37 @@ export default async function Home() {
           </div>
         </div>
 
-        <div className="webline-mosaic">
-          {mosaicImages.map((image, index) => (
+        <div className="webline-mosaic" aria-label="Project highlights">
+          {mosaicColumns.map((column, columnIndex) => (
             <div
-              className={image.tall ? "mosaic-card mosaic-card--tall" : "mosaic-card"}
-              key={`${image.alt}-${index}`}
+              className={
+                columnIndex % 2 === 0
+                  ? "webline-mosaic__column"
+                  : "webline-mosaic__column webline-mosaic__column--reverse"
+              }
+              key={`column-${columnIndex}`}
+              style={
+                {
+                  "--mosaic-duration": `${18 + columnIndex * 3}s`,
+                } as CSSProperties
+              }
             >
-              <Image
-                alt={image.alt}
-                height={image.tall ? 320 : 220}
-                priority={index < 3}
-                src={image.src}
-                width={220}
-              />
+              <div className="webline-mosaic__track">
+                {[...column, ...column].map((image, imageIndex) => (
+                  <div
+                    className={image.tall ? "mosaic-card mosaic-card--tall" : "mosaic-card"}
+                    key={`${columnIndex}-${image.alt}-${imageIndex}`}
+                  >
+                    <Image
+                      alt={image.alt}
+                      height={image.tall ? 320 : 220}
+                      priority={columnIndex < 2 && imageIndex < 2}
+                      src={image.src}
+                      width={220}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
