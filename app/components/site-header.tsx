@@ -271,23 +271,13 @@ export function SiteHeader() {
               >
                 <span>{item.label}</span>
                 <span className="nav-panel__arrow" aria-hidden="true">
-                  -&gt;
+                  ↗
                 </span>
               </Link>
             ))}
           </div>
 
           <div className="nav-panel__tools">
-            <button
-              type="button"
-              className="theme-toggle nav-panel__theme-toggle"
-              aria-label={theme === "light" ? t("header.themeLight") : t("header.themeDark")}
-              onClick={() => setTheme((current) => (current === "light" ? "dark" : "light"))}
-            >
-              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-              <span>{theme === "light" ? t("header.themeLight") : t("header.themeDark")}</span>
-            </button>
-
             <div className="nav-panel__languages">
               {localeOptions.map((option) => (
                 <button
@@ -300,28 +290,19 @@ export function SiteHeader() {
                   }
                   onClick={() => setLocaleCookie(option.code)}
                 >
-                  <span>{option.label}</span>
-                  <strong>{option.short}</strong>
+                  <span>{option.short}</span>
                 </button>
               ))}
             </div>
+            <button
+              type="button"
+              className="nav-panel__theme-toggle"
+              aria-label={theme === "light" ? t("header.themeLight") : t("header.themeDark")}
+              onClick={() => setTheme((current) => (current === "light" ? "dark" : "light"))}
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            </button>
           </div>
-
-          <div className="nav-panel__footer">
-            <div className="nav-panel__contact">
-              <span>{t("header.contactLabel")}</span>
-              <a href="mailto:info@webline.az">info@webline.az</a>
-              <a href="tel:+994505551212">+994 50 555 12 12</a>
-            </div>
-            <div className="nav-panel__meta">{t("header.meta")}</div>
-          </div>
-
-          <Link
-            className="button button-primary nav-panel__cta"
-            href={localizeHref("/contact", resolvedLocale)}
-          >
-            {t("header.cta")}
-          </Link>
         </div>
       </div>
     </header>
