@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Webline Headless CMS
  * Description: Headless WordPress configuration for the Webline Next.js frontend.
- * Version: 1.9.0
+ * Version: 1.9.1
  * Author: Misha17-27
  */
 
@@ -1290,6 +1290,65 @@ function webline_filter_permalink_html(?string $html, int $postId, ?string $newT
     return '<strong>Frontend URL:</strong> <a href="' . esc_url($url) . '" target="_blank">' . esc_html($url) . '</a>';
 }
 add_filter('get_sample_permalink_html', 'webline_filter_permalink_html', 10, 5);
+
+function webline_get_current_frontend_admin_url(): string
+{
+    if (!is_admin()) {
+        return webline_frontend_url() . '/';
+    }
+
+    $postId = 0;
+
+    if (isset($_GET['post'])) {
+        $postId = absint(wp_unslash($_GET['post']));
+    } elseif (isset($_POST['post_ID'])) {
+        $postId = absint(wp_unslash($_POST['post_ID']));
+    }
+
+    if ($postId > 0) {
+        $post = get_post($postId);
+
+        if ($post instanceof WP_Post && $post->post_type === 'page') {
+            return webline_get_frontend_page_url($post);
+        }
+    }
+
+    return webline_frontend_url() . '/';
+}
+
+function webline_customize_admin_bar_links(WP_Admin_Bar $adminBar): void
+{
+    if (!is_admin_bar_showing()) {
+        return;
+    }
+
+    $siteUrl = webline_frontend_url() . '/';
+    $currentUrl = webline_get_current_frontend_admin_url();
+
+    if ($adminBar->get_node('site-name')) {
+        $adminBar->add_node([
+            'id' => 'site-name',
+            'href' => $siteUrl,
+        ]);
+    }
+
+    if ($adminBar->get_node('view-site')) {
+        $adminBar->add_node([
+            'id' => 'view-site',
+            'parent' => 'site-name',
+            'href' => $currentUrl,
+            'title' => is_admin() && $currentUrl !== $siteUrl ? 'Visit Page' : 'Visit Site',
+        ]);
+    }
+
+    if ($adminBar->get_node('view')) {
+        $adminBar->add_node([
+            'id' => 'view',
+            'href' => $currentUrl,
+        ]);
+    }
+}
+add_action('admin_bar_menu', 'webline_customize_admin_bar_links', 999);
 
 function webline_get_services_data(): array
 {
