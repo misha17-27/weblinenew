@@ -325,7 +325,7 @@ html[data-theme="dark"] .theme-toggle:hover {
   min-height: 100vh;
   min-height: 100dvh;
   padding-top: 0;
-  background: #0d0d11;
+  background: rgba(255, 252, 247, 0.98);
   overflow: hidden;
   opacity: 0;
   visibility: hidden;
@@ -375,7 +375,7 @@ html[data-theme="dark"] .theme-toggle:hover {
   justify-content: center;
   border: 0;
   background: transparent;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(22, 22, 31, 0.62);
   font-weight: 700;
   cursor: pointer;
 }
@@ -408,8 +408,8 @@ html[data-theme="dark"] .theme-toggle:hover {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(239, 240, 246, 0.72);
+  border-bottom: 1px solid rgba(22, 22, 31, 0.08);
+  color: rgba(22, 22, 31, 0.68);
   font-size: clamp(1.15rem, 5vw, 1.45rem);
   font-weight: 500;
   letter-spacing: -0.03em;
@@ -429,11 +429,11 @@ html[data-theme="dark"] .theme-toggle:hover {
 
 .nav-panel__links a:hover,
 .nav-panel__links a.is-active {
-  color: #ffffff;
+  color: var(--text);
 }
 
 .nav-panel__arrow {
-  color: rgba(255, 255, 255, 0.34);
+  color: rgba(22, 22, 31, 0.26);
   font-size: 1rem;
   opacity: 1;
   transform: translateX(0);
@@ -449,7 +449,7 @@ html[data-theme="dark"] .theme-toggle:hover {
 .nav-panel__tools {
   margin-top: auto;
   padding-top: 1.1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(22, 22, 31, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -466,7 +466,7 @@ html[data-theme="dark"] .theme-toggle:hover {
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(22, 22, 31, 0.68);
 }
 
 .nav-panel__languages {
@@ -486,7 +486,7 @@ html[data-theme="dark"] .theme-toggle:hover {
   border: 0;
   border-radius: 0.85rem;
   background: transparent;
-  color: rgba(255, 255, 255, 0.48);
+  color: rgba(22, 22, 31, 0.48);
   text-align: center;
   font-size: 0.98rem;
   font-weight: 700;
@@ -502,7 +502,7 @@ html[data-theme="dark"] .theme-toggle:hover {
   inset: 0;
   z-index: 21;
   border: 0;
-  background: rgba(5, 6, 10, 0.12);
+  background: rgba(18, 18, 28, 0.08);
   opacity: 0;
   visibility: hidden;
   transition:
@@ -513,6 +513,44 @@ html[data-theme="dark"] .theme-toggle:hover {
 .nav-overlay.is-open {
   opacity: 1;
   visibility: visible;
+}
+
+html[data-theme="dark"] .nav-panel {
+  background: #0d0d11;
+}
+
+html[data-theme="dark"] .nav-close {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+html[data-theme="dark"] .nav-panel__links a {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  color: rgba(239, 240, 246, 0.72);
+}
+
+html[data-theme="dark"] .nav-panel__links a:hover,
+html[data-theme="dark"] .nav-panel__links a.is-active {
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .nav-panel__arrow {
+  color: rgba(255, 255, 255, 0.34);
+}
+
+html[data-theme="dark"] .nav-panel__tools {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .nav-panel__theme-toggle {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+html[data-theme="dark"] .nav-panel__language {
+  color: rgba(255, 255, 255, 0.48);
+}
+
+html[data-theme="dark"] .nav-overlay {
+  background: rgba(5, 6, 10, 0.12);
 }
 
 .nav-links a:hover,
