@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SiteFooter, SiteHeader } from "../components/site-sections";
+import { CtaStrip, SiteFooter, SiteHeader } from "../components/site-sections";
 import { localizeHref } from "../lib/locale";
 import { getCurrentLocale } from "../lib/request-locale";
 import { serviceGroups } from "../lib/services-data";
@@ -59,6 +59,13 @@ export default async function ServicesPage() {
           </div>
         ))}
       </section>
+
+      <CtaStrip
+        locale={locale}
+        eyebrow="Contact"
+        title="Əla bir şey qurmağa hazırsınız?"
+        description="Layihənizi müzakirə edək və rəqəmsal məqsədlərinizə necə çata biləcəyinizi araşdıraq."
+      />
 
       <SiteFooter
         locale={locale}
