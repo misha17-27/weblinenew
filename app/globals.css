@@ -378,6 +378,21 @@ html[data-theme="dark"] .services-reference-tabs a {
 }
 
 @media (max-width: 980px) {
+  .services-reference-tabs {
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+
+  .services-reference-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .services-reference-tabs a {
+    flex: 0 0 auto;
+  }
+
   .services-reference-group__intro,
   .service-detail-layout {
     grid-template-columns: 1fr;
@@ -2056,6 +2071,7 @@ html[data-theme="dark"] .webline-partners {
   display: flex;
   gap: 2rem;
   align-items: center;
+  overflow: hidden;
   padding: 1.25rem 0;
   color: var(--muted);
   font-size: 0.86rem;
@@ -2070,6 +2086,9 @@ html[data-theme="dark"] .webline-partners {
 .webline-partners__marquee {
   position: relative;
   flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
   overflow: hidden;
   mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.2) 6%, #000 14%, #000 86%, rgba(0, 0, 0, 0.2) 94%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.2) 6%, #000 14%, #000 86%, rgba(0, 0, 0, 0.2) 94%, transparent 100%);
