@@ -399,6 +399,32 @@ const portfolioContent: Record<LocaleCode, PortfolioDictionary> = {
 export const fallbackPortfolioProjects: PortfolioProject[] =
   portfolioContent.az.projects;
 
+const categoryCoverPresets: Record<
+  string,
+  { image: string; alt: string; featuredTitle: string }
+> = {
+  saytlar: {
+    image: "https://webline.az/wp-content/uploads/2024/02/service-01.jpg",
+    alt: "Website category preview",
+    featuredTitle: "Korporativ və məhsul saytları",
+  },
+  dizaynlar: {
+    image: "https://webline.az/wp-content/uploads/2024/02/Part-04.jpg",
+    alt: "Design category preview",
+    featuredTitle: "Brend və vizual dizayn işləri",
+  },
+  "sosial-media": {
+    image: "https://webline.az/wp-content/uploads/2024/02/Part-03.jpg",
+    alt: "Social media category preview",
+    featuredTitle: "SMM və kampaniya vizualları",
+  },
+  "video-reels": {
+    image: "https://webline.az/wp-content/uploads/2024/02/Part-06.jpg",
+    alt: "Video reels category preview",
+    featuredTitle: "Qısa format video və reels",
+  },
+};
+
 function getCategoryContent(
   locale: LocaleCode,
   categories?: PortfolioCategoryContent[]
@@ -440,10 +466,28 @@ export function getPortfolioCategories(
   );
 
   return categoryContent.map((category, index) => {
-    const previewProject =
-      projects.find((project) => project.category === category.slug) ?? projects[index] ?? projects[0];
+    const previewProject = projects.find(
+      (project) => project.category === category.slug
+    );
     const fallbackCategory = dictionary.categories[category.slug];
     const count = projectCountByCategory[category.slug] ?? 0;
+    const preset =
+      categoryCoverPresets[category.slug] ??
+      ({
+        image:
+          fallbackPortfolioProjects[0]?.image ??
+          "https://webline.az/wp-content/uploads/2024/02/service-01.jpg",
+        alt:
+          fallbackPortfolioProjects[0]?.alt ?? "Portfolio category preview",
+        featuredTitle:
+          fallbackCategory?.shortLabel ??
+          category.shortLabel ??
+          category.title,
+      } satisfies {
+        image: string;
+        alt: string;
+        featuredTitle: string;
+      });
 
     return {
       slug: category.slug,
@@ -453,14 +497,13 @@ export function getPortfolioCategories(
       shortLabel: `${count} ${dictionary.projectCountLabel}`,
       image:
         previewProject?.image ||
-        fallbackPortfolioProjects[0]?.image ||
-        "https://webline.az/wp-content/uploads/2024/02/service-01.jpg",
+        preset.image,
       alt:
         previewProject?.alt ||
-        fallbackPortfolioProjects[0]?.alt ||
-        "Portfolio category preview",
+        preset.alt,
       featuredTitle:
         previewProject?.title ||
+        preset.featuredTitle ||
         category.shortLabel ||
         fallbackCategory?.shortLabel ||
         category.title,
