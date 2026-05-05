@@ -495,15 +495,11 @@ export function getPortfolioCategories(
       description:
         category.description || fallbackCategory?.description || "",
       shortLabel: `${count} ${dictionary.projectCountLabel}`,
-      image:
-        previewProject?.image ||
-        preset.image,
-      alt:
-        previewProject?.alt ||
-        preset.alt,
+      image: preset.image,
+      alt: preset.alt,
       featuredTitle:
-        previewProject?.title ||
         preset.featuredTitle ||
+        previewProject?.title ||
         category.shortLabel ||
         fallbackCategory?.shortLabel ||
         category.title,
